@@ -24,9 +24,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2757C22E2CE4F55B000C489A /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		2757C23E2CE4F55D000C489A /* AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2757C2482CE4F55D000C489A /* AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2757C22E2CE4F55B000C489A /* MotiMate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MotiMate.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2757C23E2CE4F55D000C489A /* MotiMateTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MotiMateTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2757C2482CE4F55D000C489A /* MotiMateUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MotiMateUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -85,9 +85,9 @@
 		2757C22F2CE4F55B000C489A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2757C22E2CE4F55B000C489A /* App.app */,
-				2757C23E2CE4F55D000C489A /* AppTests.xctest */,
-				2757C2482CE4F55D000C489A /* AppUITests.xctest */,
+				2757C22E2CE4F55B000C489A /* MotiMate.app */,
+				2757C23E2CE4F55D000C489A /* MotiMateTests.xctest */,
+				2757C2482CE4F55D000C489A /* MotiMateUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2757C22D2CE4F55B000C489A /* App */ = {
+		2757C22D2CE4F55B000C489A /* MotiMate */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2757C2522CE4F55D000C489A /* Build configuration list for PBXNativeTarget "App" */;
+			buildConfigurationList = 2757C2522CE4F55D000C489A /* Build configuration list for PBXNativeTarget "MotiMate" */;
 			buildPhases = (
 				2757C22A2CE4F55B000C489A /* Sources */,
 				2757C22B2CE4F55B000C489A /* Frameworks */,
@@ -110,16 +110,16 @@
 			fileSystemSynchronizedGroups = (
 				2757C2302CE4F55B000C489A /* App */,
 			);
-			name = App;
+			name = MotiMate;
 			packageProductDependencies = (
 			);
 			productName = App;
-			productReference = 2757C22E2CE4F55B000C489A /* App.app */;
+			productReference = 2757C22E2CE4F55B000C489A /* MotiMate.app */;
 			productType = "com.apple.product-type.application";
 		};
-		2757C23D2CE4F55C000C489A /* AppTests */ = {
+		2757C23D2CE4F55C000C489A /* MotiMateTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2757C2552CE4F55D000C489A /* Build configuration list for PBXNativeTarget "AppTests" */;
+			buildConfigurationList = 2757C2552CE4F55D000C489A /* Build configuration list for PBXNativeTarget "MotiMateTests" */;
 			buildPhases = (
 				2757C23A2CE4F55C000C489A /* Sources */,
 				2757C23B2CE4F55C000C489A /* Frameworks */,
@@ -133,16 +133,16 @@
 			fileSystemSynchronizedGroups = (
 				2757C2412CE4F55D000C489A /* AppTests */,
 			);
-			name = AppTests;
+			name = MotiMateTests;
 			packageProductDependencies = (
 			);
 			productName = AppTests;
-			productReference = 2757C23E2CE4F55D000C489A /* AppTests.xctest */;
+			productReference = 2757C23E2CE4F55D000C489A /* MotiMateTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		2757C2472CE4F55D000C489A /* AppUITests */ = {
+		2757C2472CE4F55D000C489A /* MotiMateUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2757C2582CE4F55D000C489A /* Build configuration list for PBXNativeTarget "AppUITests" */;
+			buildConfigurationList = 2757C2582CE4F55D000C489A /* Build configuration list for PBXNativeTarget "MotiMateUITests" */;
 			buildPhases = (
 				2757C2442CE4F55D000C489A /* Sources */,
 				2757C2452CE4F55D000C489A /* Frameworks */,
@@ -156,11 +156,11 @@
 			fileSystemSynchronizedGroups = (
 				2757C24B2CE4F55D000C489A /* AppUITests */,
 			);
-			name = AppUITests;
+			name = MotiMateUITests;
 			packageProductDependencies = (
 			);
 			productName = AppUITests;
-			productReference = 2757C2482CE4F55D000C489A /* AppUITests.xctest */;
+			productReference = 2757C2482CE4F55D000C489A /* MotiMateUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -186,7 +186,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 2757C2292CE4F55B000C489A /* Build configuration list for PBXProject "App" */;
+			buildConfigurationList = 2757C2292CE4F55B000C489A /* Build configuration list for PBXProject "MotiMate" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -200,9 +200,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2757C22D2CE4F55B000C489A /* App */,
-				2757C23D2CE4F55C000C489A /* AppTests */,
-				2757C2472CE4F55D000C489A /* AppUITests */,
+				2757C22D2CE4F55B000C489A /* MotiMate */,
+				2757C23D2CE4F55C000C489A /* MotiMateTests */,
+				2757C2472CE4F55D000C489A /* MotiMateUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,12 +258,12 @@
 /* Begin PBXTargetDependency section */
 		2757C2402CE4F55D000C489A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 2757C22D2CE4F55B000C489A /* App */;
+			target = 2757C22D2CE4F55B000C489A /* MotiMate */;
 			targetProxy = 2757C23F2CE4F55D000C489A /* PBXContainerItemProxy */;
 		};
 		2757C24A2CE4F55D000C489A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 2757C22D2CE4F55B000C489A /* App */;
+			target = 2757C22D2CE4F55B000C489A /* MotiMate */;
 			targetProxy = 2757C2492CE4F55D000C489A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -461,7 +461,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/App";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MotiMate.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MotiMate";
 			};
 			name = Debug;
 		};
@@ -480,7 +480,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/App";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MotiMate.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MotiMate";
 			};
 			name = Release;
 		};
@@ -521,7 +521,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2757C2292CE4F55B000C489A /* Build configuration list for PBXProject "App" */ = {
+		2757C2292CE4F55B000C489A /* Build configuration list for PBXProject "MotiMate" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2757C2502CE4F55D000C489A /* Debug */,
@@ -530,7 +530,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2757C2522CE4F55D000C489A /* Build configuration list for PBXNativeTarget "App" */ = {
+		2757C2522CE4F55D000C489A /* Build configuration list for PBXNativeTarget "MotiMate" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2757C2532CE4F55D000C489A /* Debug */,
@@ -539,7 +539,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2757C2552CE4F55D000C489A /* Build configuration list for PBXNativeTarget "AppTests" */ = {
+		2757C2552CE4F55D000C489A /* Build configuration list for PBXNativeTarget "MotiMateTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2757C2562CE4F55D000C489A /* Debug */,
@@ -548,7 +548,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2757C2582CE4F55D000C489A /* Build configuration list for PBXNativeTarget "AppUITests" */ = {
+		2757C2582CE4F55D000C489A /* Build configuration list for PBXNativeTarget "MotiMateUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2757C2592CE4F55D000C489A /* Debug */,
