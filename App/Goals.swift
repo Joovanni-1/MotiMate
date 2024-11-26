@@ -20,11 +20,28 @@ struct Goals: View {
     var body: some View {
         TabView(selection: $selected){
             Home(selected:$selected)
-            .tabItem{Image(systemName: "house")}
+                .tabItem{
+                    VStack{
+                        
+                        Image(systemName: "house")
+                            
+                        
+                    }
+                }
+           Text("Ciauuuuu")
+                .tabItem{
+                    VStack {Spacer() .frame(height: 20)
+                        Image(systemName: "person")
+                        
+                    }
+                }
             Text("Ciauuuuu")
-            .tabItem{Image(systemName: "person")}
-            Text("Ciauuuuu")
-            .tabItem{Image(systemName: "")}
+                .tabItem{
+                    VStack {Spacer().frame(height: 20)
+                        Image(systemName: "gear")
+                    }
+                    }
+                
             
         }
     }
@@ -32,5 +49,5 @@ struct Goals: View {
 }
 
 #Preview {
-    Goals( )
+    Goals( ).environmentObject(AppVariables())
 }
