@@ -147,7 +147,7 @@ struct Nickname: View{
             if showPicker2  {
                 Picker("Sesso", selection: $sex) {
                     ForEach(genders, id:\.self) { gender in
-                        Text("\(gender)")
+                        Text(gender)
                             .tag(gender)
                     }
                 }

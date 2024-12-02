@@ -16,31 +16,38 @@ struct Goals: View {
     // ricordati che Risparmiare avrà un altra schermata
     
     @State var selected: Int = 0
-    
+    @State private var showTabView = true
     var body: some View {
-        TabView(selection: $selected){
-            Home(selected:$selected)
-                .tabItem{
-                    VStack{
-                        
-                        Image(systemName: "house")
-                            
-                        
-                    }
+        
+        NavigationStack{
+            if showTabView {
+                TabView(selection: $selected){
+                    Home(selected:$selected, showTabView: $showTabView)
+                        .tabItem{
+                            VStack{
+                                
+                                Image(systemName: "house")
+                                
+                                
+                            }
+                        }
+                    Text("Ciauuuuu")
+                        .tabItem{
+                            VStack {Spacer() .frame(height: 20)
+                                Image(systemName: "person")
+                                
+                            }
+                        }
+                    Text("Ciauuuuu")
+                        .tabItem{
+                            VStack {Spacer().frame(height: 20)
+                                Image(systemName: "gear")
+                            }
+                        }
                 }
-           Text("Ciauuuuu")
-                .tabItem{
-                    VStack {Spacer() .frame(height: 20)
-                        Image(systemName: "person")
-                        
-                    }
+            } else {
+                    EmptyView() // Nasconde la TabView
                 }
-            Text("Ciauuuuu")
-                .tabItem{
-                    VStack {Spacer().frame(height: 20)
-                        Image(systemName: "gear")
-                    }
-                    }
                 
             
         }

@@ -12,8 +12,9 @@ class AppVariables: ObservableObject{
 struct Home: View {
     @Binding var selected: Int
     @EnvironmentObject var variables: AppVariables
+    @Binding var showTabView: Bool
     
-    @State var habits:[String] = ["Attività Fisica ","Salute Mentale","Alimentazione e Idratazione","Studio e Creatività", "Risparmiare"]
+    @State var habits:[String] = ["Attività Fisica","Salute Mentale","Alimentazione e Idratazione","Studio e Creatività", "Risparmiare"]
     @State var newHabit: String = ""
     @State var isAddingNewHabit: Bool = false
     @State var page1: Bool = false
@@ -73,32 +74,39 @@ struct Home: View {
                     //fine v stack
                 }
                
-                ForEach (habits, id:\.self){item in
-                         RoundedRectangle(cornerRadius:20)
-                                .fill(Color.mint)
-                                .stroke(Color.black, lineWidth:2)
-                                .overlay(
-                                    HStack{
-                                        Text(item)
-                                            .font(.title)
-                                        
-                                    })
-                                .onTapGesture (count:1,perform:{
-                                    page1.toggle()
-                                })
-                                .frame(maxWidth:.infinity)
-                                .frame(height:180)
+               
+                
+                ForEach (habits, id:\.self){ habit in
                         
-       
+                     NavigationLink(destination: destinationView(for: habit)
+                        .onAppear {
+                         showTabView = false // Nascondi TabView
+                     }
+                     .onDisappear {
+                         showTabView = true // Mostra TabView al ritorno
+                     }, label: {
+                        RoundedRectangle(cornerRadius:20)
+                            .fill(Color.mint)
+                            .stroke(Color.black, lineWidth:2)
+                            .overlay(
+                                HStack{
+                                    Text(habit)
+                                        .font(.title)
+                                    
+                                })
+                            .frame(maxWidth:.infinity)
+                            .frame(height:180)
+                    }
+       )
                 }
+                
+
                    /* per ogni macro categoria creare una pagina (che deve essere uguale per tutti)
                     con calendario, grafici, to-do list ()
                     nel caso di classifiche aggiungere nella tab view un icona
                     */
                 
-                if page1{
-                    
-                }
+                
             
                 
             }.navigationTitle("Benvenuto:\(variables.globalName)")
@@ -106,7 +114,10 @@ struct Home: View {
         }//fine nav
     }
     
-   
+    @ViewBuilder
+    func destinationView(for habit: String) -> some View {
+        HabitView(macroAbitudine: habit) // Passa il nome della macroabitudine
+    }
    
 }
 
@@ -119,3 +130,6 @@ struct Home: View {
         .environmentObject(AppVariables())
 
 }
+
+
+
