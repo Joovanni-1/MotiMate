@@ -10,11 +10,11 @@ import SwiftUI
 import Charts
 
 // problema: disconessione tra rettangolo bianco e grafico e giorno all'inizio dell'apertura della schermata
-// il grafico funziona però fa una media in base a quante abitudini hai inserito
+// il grafico funziona però fa una media in base a quante abitudini hai inserito totali
 
 // Modello per una singola abitudine
-struct Abitudine: Identifiable {
-    let id = UUID()
+struct Abitudine: Identifiable, Codable {
+    var id = UUID()
     var nome: String
     var orario: String
     var giorno: Date
@@ -24,15 +24,41 @@ struct Abitudine: Identifiable {
     var completamentiDate: [Date: Bool] = [:]
     var dataFineValidita: Date?
     var macroAbitudine: String
+    var giorniEsclusi: [Date] = []
+    var giorniCompletati: [Date] = []
+    
+    init(nome: String, orario: String, giorno: Date, completata: Bool, daysOfWeek: [Bool], completamentiGiorni: [Bool], macroAbitudine: String) {
+            self.id = UUID()
+            self.nome = nome
+            self.orario = orario
+            self.giorno = giorno
+            self.completata = completata
+            self.daysOfWeek = daysOfWeek
+            self.completamentiGiorni = completamentiGiorni
+            self.completamentiDate = [:]
+            self.dataFineValidita = nil
+            self.macroAbitudine = macroAbitudine
+        }
 }
  
 // ViewModel per gestire le abitudini
 class AbitudiniViewModel: ObservableObject {
-    @Published var abitudini : [Abitudine] = []
+    @Published var abitudini : [Abitudine] = [] {
+            didSet {
+                if let dati = try? JSONEncoder().encode(abitudini) {
+                            UserDefaults.standard.set(dati, forKey: "abitudini")
+                        }
+            }
+        }
+
+    @Published var isDeleting: Bool = false
     
     init() {
-        aggiungiAbitudine(nome: "Esercizi mattutini", orario: "07:00", giorno: Date(), giorniSelezionati: [true, true, true, true, false, true, true],  macroAbitudine: "Attività Fisica")
+            caricaDati()
         }
+   /* init() {
+        aggiungiAbitudine(nome: "Esercizi mattutini", orario: "07:00", giorno: Date(), giorniSelezionati: [true, true, true, true, false, true, true],  macroAbitudine: "Attività Fisica")
+        }*/
     
     func aggiungiAbitudine(nome: String, orario: String, giorno: Date, giorniSelezionati: [Bool], macroAbitudine: String){
  
@@ -42,7 +68,7 @@ class AbitudiniViewModel: ObservableObject {
             giorno: giorno,
             completata: false,
             daysOfWeek : giorniSelezionati,
-            completamentiGiorni: [false],
+            completamentiGiorni: Array(repeating: false, count: giorniSelezionati.filter { $0 }.count),
             macroAbitudine: macroAbitudine
         )
         abitudini.append(nuovaAbitudine)
@@ -59,24 +85,40 @@ class AbitudiniViewModel: ObservableObject {
     
     func eliminaSoloPerUnGiorno(id: UUID, giorno: Date) {
         if let index = abitudini.firstIndex(where: { $0.id == id }) {
-            // Rimuove la validità solo per il giorno specifico
+            
             // credo che qua sta il problema
-            abitudini[index].completamentiDate[giorno] = true
+            abitudini[index].completamentiDate[giorno] = false
+          
+            
         }
     }
     
     func spuntaAbitudine(id: UUID, giorno: Date) {
         if let index = abitudini.firstIndex(where: { $0.id == id }) {
             // Verifica lo stato attuale e alterna
+            
             let attualeStato = abitudini[index].completamentiDate[giorno] ?? false
             abitudini[index].completamentiDate[giorno] = !attualeStato
+            abitudini=abitudini
             
         }
     }
     
+    private func caricaDati() {
+        if let dati = UserDefaults.standard.data(forKey: "abitudini"),
+                   let abitudiniDecodificate = try? JSONDecoder().decode([Abitudine].self, from: dati) {
+            DispatchQueue.main.async{
+                self.abitudini = abitudiniDecodificate
+            }
+        } else{
+            self.abitudini = []
+        }
+        }
+    
     
     
 }
+
 class Constants {
     static let giorniSettimana = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"]
 }
@@ -185,6 +227,7 @@ struct HabitView: View {
         .cornerRadius(10)
         .onTapGesture {
             giornoSelezionato = giorno
+            aggiornaAbitudini()
         }
     }
     func cambiaSettimana(delta: Int) {
@@ -233,8 +276,8 @@ struct HabitView: View {
                 Label("Elimina per sempre", systemImage: "trash")
             }
             Button {
-                if let giornoSelezionato = giornoSelezionato {
-                    viewModel.eliminaSoloPerUnGiorno(id: abitudine.id, giorno: giornoSelezionato)
+                if let giorno = giornoSelezionato {
+                    viewModel.eliminaSoloPerUnGiorno(id: abitudine.id, giorno: giorno)
                 }
             } label: {
                 Label("Elimina solo oggi", systemImage: "calendar.badge.minus")
@@ -247,205 +290,7 @@ struct HabitView: View {
         }
     }
 
-/*struct HabitView: View {
-    
-    var macroAbitudine: String
-    
-    @State private var dataCorrente = Date()
-    @State private var nomeAbitudine = ""
-    @State private var orarioAbitudine = ""
-    @StateObject var viewModel = AbitudiniViewModel()
-    @State private var giornoSelezionato: Date? = Date()
-    let calendar = Calendar.current
-   
-    @State var newhabit: Bool = false
-    @State private var abitudineDaModificare: Abitudine?
-    
-    var body: some View {
-       
-        NavigationView{
-                ZStack{
-                    LinearGradient(colors: [Color("verdino"),Color("bluino")], startPoint: .bottomLeading, endPoint: .topTrailing)
-                        .edgesIgnoringSafeArea(.all)
-                    ScrollView{
-                    VStack {
-                        
-                        Text(macroAbitudine)
-                            .font(.largeTitle)
-                            .bold()
-                        // Calendario settimanale
-                        calendarioSettimana
-                        
-                        
-                        // Sezione per aggiungere nuove abitudini
-                        Button(action:{
-                            newhabit.toggle()
-                            
-                        },label:{
-                            Image(systemName:"plus")
-                            
-                        }).sheet(isPresented: $newhabit) {
-                            CreateHabitView(viewModel: viewModel, macroAbitudine: macroAbitudine)
-                        }
-                        
-                       
-                         
-                        VStack {
-                            ForEach(filtraAbitudiniPerGiornoSelezionato(giornoSelezionato)) { abitudine in
-                                HStack {
-                                    VStack(alignment: .leading) {
-                                        Text(abitudine.nome)
-                                            .font(.headline)
-                                        Text("Orario: \(abitudine.orario)")
-                                            .font(.subheadline)
-                                        
-                                        let selectedIndices = abitudine.daysOfWeek.indices.filter { abitudine.daysOfWeek[$0] }
-                                        let giorniNomi = selectedIndices.map { Constants.giorniSettimana[$0] }
-                                        let giorni = giorniNomi.joined(separator: ", ")
- 
-                                        Text("Giorni selezionati: \(giorni)")
-                                            .font(.subheadline)
-                                    }
-                                    Spacer()
-                                    Menu {
-                                        Button(role: .destructive) {
-                                            viewModel.eliminaAbitudine(id: abitudine.id, daData: giornoSelezionato ?? Date())
-                                        } label: {
-                                            Label("Elimina per sempre", systemImage: "trash")
-                                        }
-                                        Button {
-                                                if let giornoSelezionato = giornoSelezionato {
-                                                    viewModel.eliminaSoloPerUnGiorno(id: abitudine.id, giorno: giornoSelezionato)
-                                                }
-                                            } label: {
-                                                Label("Elimina solo oggi", systemImage: "calendar.badge.minus")
-                                            }
-                                        // se hai tempo da perdere caèisci come funziona
-                                        /*Button {
-                                            abitudineDaModificare = abitudine
-                                            newhabit = true
-                                        } label: {
-                                            Label("Modifica", systemImage: "pencil")
-                                        }*/
-                                    } label: {
-                                        Image(systemName: "ellipsis.circle")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 25, height: 25)
-                                    }
-                                    
-                                }
-                                .padding()
-                                .background(
-                                    (giornoSelezionato != nil &&
-                                     (abitudine.completamentiDate[giornoSelezionato!] ?? false))
-                                        ? Color.pink.opacity(0.4)
-                                        : Color.white
-                                )
-                                // .animation(.easeInOut(duration: 0.3),value : abitudine.completata)
-                                .cornerRadius(30)
-                                .shadow(radius: 5)
-                                .onTapGesture{
-                                    if let giornoSelezionato = giornoSelezionato {
-                                            viewModel.spuntaAbitudine(id: abitudine.id, giorno: giornoSelezionato)
-                                        }
-                                }
-                                .sheet(isPresented: $newhabit) {
-                                    CreateHabitView(viewModel: viewModel)
-                                        
-                                }
-                            }
-                            Spacer()
-                                .frame(height: 80)
-                            graficoPercentualeCompletamento
-                        }
-                        .padding()
-                        
-                        
-     
-                    }
-                    .onAppear {
-                        
-                        giornoSelezionato = Date()
-                       
-                        
-                                    }
-                    
-                    
-                }.scrollIndicators(.hidden)
-      }
-}
-        .environmentObject(viewModel)
-    }
-    //MARK: VAR
-    // Sezione del calendario settimanale
-    var calendarioSettimana: some View {
-        VStack {
-            Text("\(formattedDate(dataCorrente))"+" \(formattedAnno(dataCorrente)) ")
-              .font(.headline)
-            HStack {
-                Button(action: {
-                    dataCorrente = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: dataCorrente)!
-                    giornoSelezionato = getStartOfWeek(for: dataCorrente)
-                }) {
-                    Image(systemName: "chevron.left.circle.fill")
-                        .font(.largeTitle)
-                        .foregroundColor(.blue)
-                }
-                
-               // Spacer()
-                    
-                // Griglia settimanale
-                LazyHGrid(rows: [GridItem(.flexible())], spacing: 10) {
-                    ForEach(0..<7) { index in
-                        
-                        let giorno = getStartOfWeek(for: dataCorrente).addingTimeInterval(Double(index * 86400)) // Aggiungiamo 86400 secondi (1 giorno)
-                       
-                        VStack {
-                            Text(dayOfWeek(for: giorno))
-                                .font(.headline)
-                                .foregroundColor(.blue)
-                                
-                            
-                            Text(dayNumber(for: giorno))
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                        }
-                        .background(
-                            
-                            calendar.isDate(giorno, inSameDayAs: giornoSelezionato ?? Date())
-                                ? Color.blue.opacity(0.4)
-                                : Color.clear
-                        )
-                        
-                        .cornerRadius(10)
-                        .onTapGesture {
-                            giornoSelezionato = giorno
-                        }
-                    }
-                }
-                
-               
-               
-                
-              //  Spacer()
-                
-                Button(action: {
-                    dataCorrente = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: dataCorrente)!
-                    giornoSelezionato = getStartOfWeek(for: dataCorrente)
-                }) {
-                    Image(systemName: "chevron.right.circle.fill")
-                        .font(.largeTitle)
-                        .foregroundColor(.blue)
-                }
-            }
-            .padding()
-            
-            
-            
-        }
-    }
- */
+
     var graficoPercentualeCompletamento: some View {
             VStack {
                 Text("Percentuale di Completamento Settimanale")
@@ -546,21 +391,29 @@ struct HabitView: View {
     
     
     func filtraAbitudiniPerGiornoSelezionato(_ giornoSelezionato: Date?) -> [Abitudine] {
-        guard let giornoSelezionato = giornoSelezionato else { return [] }
+       
      
         // Filtra per macro abitudine
         let macroFiltered = viewModel.abitudini.filter { $0.macroAbitudine == macroAbitudine }
+        guard let giornoSelezionato = giornoSelezionato else { return [] }
         
         return macroFiltered.filter { abitudine in
+            let validoInGiorno = abitudine.completamentiDate[giornoSelezionato] ?? true
+            let isDateValid = abitudine.dataFineValidita == nil || giornoSelezionato <= abitudine.dataFineValidita!
                 
-                let isDateValid = abitudine.dataFineValidita == nil || giornoSelezionato <= abitudine.dataFineValidita!
-                return isDateValid
-            }
+                return isDateValid && validoInGiorno
+        }
+    }
+    func aggiornaAbitudini() {
+        withAnimation {
+            viewModel.abitudini = viewModel.abitudini
+        }
     }
 }
  
 #Preview {
-    HabitView(macroAbitudine: "Attività Fisica") // Passa un valore di esempio per macroAbitudine
+    HabitView(macroAbitudine: "Attività Fisica")
+    // Passa un valore di esempio per macroAbitudine
              
     }
 

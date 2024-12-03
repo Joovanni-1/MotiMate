@@ -13,7 +13,7 @@ struct Home: View {
     @Binding var selected: Int
     @EnvironmentObject var variables: AppVariables
     @Binding var showTabView: Bool
-    
+    @StateObject var viewModel = AbitudiniViewModel()
     @State var habits:[String] = ["Attività Fisica","Salute Mentale","Alimentazione e Idratazione","Studio e Creatività", "Risparmiare"]
     @State var newHabit: String = ""
     @State var isAddingNewHabit: Bool = false
@@ -116,7 +116,7 @@ struct Home: View {
     
     @ViewBuilder
     func destinationView(for habit: String) -> some View {
-        HabitView(macroAbitudine: habit) // Passa il nome della macroabitudine
+        HabitView(macroAbitudine: habit)// Passa il nome della macroabitudine
     }
    
 }
