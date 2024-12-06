@@ -6,14 +6,13 @@
 //
 
 import SwiftUI
-class AppVariables: ObservableObject{
-    @Published var globalName: String = ""
-}
+
 struct Home: View {
     @Binding var selected: Int
     @EnvironmentObject var variables: AppVariables
     @Binding var showTabView: Bool
-    @StateObject var viewModel = AbitudiniViewModel()
+    @EnvironmentObject var viewModel: AbitudiniViewModel
+   
     @State var habits:[String] = ["Attività Fisica","Salute Mentale","Alimentazione e Idratazione","Studio e Creatività", "Risparmiare"]
     @State var newHabit: String = ""
     @State var isAddingNewHabit: Bool = false
@@ -90,9 +89,13 @@ struct Home: View {
                             .stroke(Color.black, lineWidth:2)
                             .overlay(
                                 HStack{
+                                    Spacer()
                                     Text(habit)
                                         .font(.title)
-                                    
+                                    Spacer()
+                                    SVGtoSwiftUIView(divisions:5, completation: 3)
+                                        
+                                        
                                 })
                             .frame(maxWidth:.infinity)
                             .frame(height:180)
@@ -109,7 +112,7 @@ struct Home: View {
                 
             
                 
-            }.navigationTitle("Benvenuto:\(variables.globalName)")
+            }.navigationTitle("Benvenuto:\(variables.nickname)")
               //fine scroll
         }//fine nav
     }
@@ -126,10 +129,49 @@ struct Home: View {
                                     
 
 #Preview {
-    Goals(selected:1)
+    Goals(selected:0)
         .environmentObject(AppVariables())
+     .environmentObject(AbitudiniViewModel())
+    /*Home(
+            selected: .constant(0), // Tab selezionato di default
+            showTabView: .constant(true) // TabView visibile di default
+        )
+        .environmentObject(AbitudiniViewModel())
+        .environmentObject(AppVariables())*/
 
 }
 
+struct SVGtoSwiftUIView: View {
+    var divisions: Int  // Numero di divisioni del cerchio
+    var completation: Int
+        var body: some View {
+            ZStack {
+                // Cerchio principale
+                Circle()
+                    .strokeBorder(Color.white, lineWidth: 13)
+                    .frame(width: 110, height: 110)
+
+                // Divisioni del cerchio
+                ForEach(0..<divisions) { index in
+                    Path { path in
+                        let angle = Angle.degrees(Double(index) * (360.0 / Double(divisions)))
+                        let radius: CGFloat = 66.5 // Raggio del cerchio
+                        let startX = 93 + cos(angle.radians) * radius
+                        let startY = 93 + sin(angle.radians) * radius
+                        path.move(to: CGPoint(x: 93, y: 93)) // Centro
+                        path.addLine(to: CGPoint(x: startX, y: startY))
+                    }
+                    .stroke(Color.mint, lineWidth: 8)
+                    .overlay(Text("\(completation) / \(divisions)")
+                        .font(.system(size: 20))
+                        .bold()
+                    )
+                }
+            }
+            .frame(width: 186, height: 186)
+            
+            
+        }
+    }
 
 

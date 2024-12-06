@@ -16,6 +16,7 @@ struct Goals: View {
     // ricordati che Risparmiare avrà un altra schermata
     
     @State var selected: Int = 0
+    @State var selected1: Int = 1
     @State private var showTabView = true
     var body: some View {
         
@@ -29,21 +30,21 @@ struct Goals: View {
                                 Image(systemName: "house")
                                 
                                 
-                            }
+                            }.tag(0)
                         }
-                    Text("Ciauuuuu")
+                    Profile() 
                         .tabItem{
                             VStack {Spacer() .frame(height: 20)
                                 Image(systemName: "person")
                                 
                             }
-                        }
-                    Text("Ciauuuuu")
+                        }.tag(1)
+                    Settings()
                         .tabItem{
                             VStack {Spacer().frame(height: 20)
                                 Image(systemName: "gear")
                             }
-                        }
+                        }.tag(2)
                 }
             } else {
                     EmptyView() // Nasconde la TabView
@@ -56,5 +57,6 @@ struct Goals: View {
 }
 
 #Preview {
-    Goals( ).environmentObject(AppVariables())
+    Goals().environmentObject(AppVariables())
+        .environmentObject(AbitudiniViewModel())
 }

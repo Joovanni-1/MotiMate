@@ -10,14 +10,13 @@ import SwiftUI
 struct Nickname: View{
     //MARK: PROPERTIES
     
-    @State var nickname: String = ""
+    
     @StateObject var variables = AppVariables()
-    @State var cognome: String = ""
-    @State var age: Int = 0
-    @State var sex: String = ""
+   
     @State var showPicker1: Bool = false
     @State var showPicker2: Bool = false
     @State var click: Bool = false
+    @State var showAlert: Bool = false
     
     let genders: [String]=["Maschio","Femmina","Altro  "]
     
@@ -44,16 +43,16 @@ struct Nickname: View{
              //  Spacer()
                   .frame(height:300)
                 
-                TextField("Nickname", text: $nickname)
+                TextField("Nickname", text: $variables.nickname )
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                 
                 TextField("Inserisci il tuo nome", text: $variables.globalName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                 
-                TextField("Inserisci il tuo cognome", text: $cognome)
+                TextField("Inserisci il tuo cognome", text: $variables.cognome)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                 
-                HStack { Text("Età: \(age)")
+                HStack { Text("Età: \(variables.age)")
                         .font(.headline)
                     Spacer()
                     Button(action: {
@@ -68,7 +67,7 @@ struct Nickname: View{
                     })
                 }
                 
-                HStack { Text("Sesso: \(sex)")
+                HStack { Text("Genere: \(variables.sex)")
                         .font(.headline)
                     Spacer()
                     Button(action: {
@@ -83,10 +82,23 @@ struct Nickname: View{
                     })
                 }
  
+               
+               
+                
                 
                 
                 Button(action: {
-                    click.toggle()
+                    if !variables.nickname.isEmpty && !variables.globalName.isEmpty && !variables.cognome.isEmpty &&
+                        !variables.sex.isEmpty{
+                        click.toggle()
+                       
+                        
+                    }else{
+                         showAlert = true
+                    }
+                   
+                    
+                    
                 }, label: {
                     VStack{
                     Image(systemName:"arrowshape.forward")
@@ -96,7 +108,8 @@ struct Nickname: View{
                 })
                 .frame(width:200,height:80)
                 
-                .background(Color.blue)
+                .background( !variables.nickname.isEmpty && !variables.globalName.isEmpty && !variables.cognome.isEmpty &&
+                             !variables.sex.isEmpty ? Color.blue : Color.gray)
                     .cornerRadius(20)
                     .shadow(radius: 50)
                     .offset(y:50)
@@ -104,8 +117,10 @@ struct Nickname: View{
                     .fontWeight(.bold)
                     .foregroundColor(Color.white)
                     .padding(.top,100)
+                    .alert(isPresented: $showAlert) {
+                        Alert( title: Text("Attenzione, compila i campi!"),  message: Text(""), dismissButton: .default(Text("OK")))}
                 
-                //commento per alessia : abbiamo cambiato con una transazione verso sinistra
+                
                     
                 /*.fullScreenCover(isPresented: $click,content:{
                         
@@ -145,27 +160,29 @@ struct Nickname: View{
         VStack{
             Spacer()
             if showPicker2  {
-                Picker("Sesso", selection: $sex) {
+                
+            Picker("Sesso", selection: $variables.sex) {
                     ForEach(genders, id:\.self) { gender in
                         Text(gender)
                             .tag(gender)
                     }
                 }
-                .pickerStyle(MenuPickerStyle())
+                .pickerStyle(WheelPickerStyle())
                 //.background(Color.white)
-                .padding()
+                .background(Color.white)
                 
-                .frame(height: 90)
-                .cornerRadius(8)
-                .onChange(of: sex){_ in showPicker2 = false }
-                .offset(x:-20,y:-258.4)
-                //.offset(y:-200)
+                .cornerRadius(10)
+                
+                .padding(.all,60)
+                .onChange(of: variables.sex){_ in showPicker2 = false }
+                
+                //.offset(y:-200)*/
             }
             
             
             
             if showPicker1  {
-                Picker("Età", selection: $age) {
+                Picker("Età", selection: $variables.age) {
                     ForEach(0..<100) { number in
                         Text("\(number)").tag(number)
                     }
@@ -178,7 +195,7 @@ struct Nickname: View{
                 
                 .padding(.all,60)
                 
-                .onChange(of: age){_ in showPicker1 = false}
+                .onChange(of: variables.age){_ in showPicker1 = false}
                 
             }
         }
@@ -202,5 +219,5 @@ struct Nickname: View{
 
 
 #Preview {
-    Nickname()
+    Nickname().environmentObject(AbitudiniViewModel())
 }

@@ -7,6 +7,7 @@
 
 
 import SwiftUI
+import UserNotifications
  
 struct CreateHabitView: View {
     
@@ -20,7 +21,8 @@ struct CreateHabitView: View {
     @State private var giorniSelezionati: [Bool] = Array(repeating: false, count: 7)
     @State private var reminderEnabled: Bool = false
     @State private var reminderTime: Date = Date()
-    
+    @State private var showAlert: Bool = false
+    private var isFormValid: Bool {!nomeAbitudine.isEmpty && giorniSelezionati.contains(true) && reminderEnabled}
     var macroAbitudine: String
     
     func formattaOrario(_date: Date)-> String{
@@ -28,6 +30,8 @@ struct CreateHabitView: View {
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: _date )
     }
+
+    
     
     var body: some View {
         
@@ -92,17 +96,20 @@ struct CreateHabitView: View {
                         Spacer()
                         Button(action: {
                             
-                           // Aggiunge la nuova abitudine al ViewModel
-                            guard !nomeAbitudine.isEmpty else { return }
-                            viewModel.aggiungiAbitudine(
-                                nome: nomeAbitudine,
-                                orario: formattaOrario(_date: orarioAbitudine),
-                                giorno: Date(),
-                                giorniSelezionati: giorniSelezionati,
-                                macroAbitudine: macroAbitudine
+                            // Se ha compilato tutti i campi aggiunge la nuova abitudine al ViewModel
+                            if isFormValid {
+                                viewModel.aggiungiAbitudine(
+                                    nome: nomeAbitudine,
+                                    orario: formattaOrario(_date: orarioAbitudine),
+                                    giorno: Date(),
+                                    giorniSelezionati: giorniSelezionati,
+                                    macroAbitudine: macroAbitudine
                                 )
-                            presentationMode.wrappedValue.dismiss()
-                        },label: {
+                                scheduleNotification()
+                                presentationMode.wrappedValue.dismiss()
+                            }else{
+                                showAlert = true
+                            }},label: {
                             Text("Salva")
                                 .bold()
                                 .frame(maxWidth: .infinity)
@@ -112,6 +119,8 @@ struct CreateHabitView: View {
                                 .cornerRadius(10)
                         })
                         .padding(.horizontal)
+                        .alert(isPresented: $showAlert){
+                            Alert( title: Text("Per favore, assicurati di aver compilato tutti i dati!"),  message: Text(""), dismissButton: .default(Text("OK")))}
                         
                     }
                     
@@ -120,13 +129,48 @@ struct CreateHabitView: View {
                     .navigationBarItems(leading: Button("Cancel") {
                         presentationMode.wrappedValue.dismiss()
                     })
+                    .onAppear {
+                        requestNotificationPermission() // Richiede l'autorizzazione per le notifiche
+                    }
                 }
             }
     
     
     
+    //MARK: FUNZIONI
+    // Funzione per programmare la notifica
+        func scheduleNotification() {
+            let content = UNMutableNotificationContent()
+            content.title = "Promemoria Abitudine"
+            content.body = "È ora di completare l'abitudine: \(nomeAbitudine)"
+            content.sound = UNNotificationSound.default
+            
+            // Configura il trigger della notifica
+            let triggerDate = Calendar.current.dateComponents([.hour, .minute], from: reminderTime)
+            let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: true)
+            
+            // Crea la richiesta di notifica
+            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+            
+            // Aggiungi la notifica al centro notifiche
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error = error {
+                    print("Errore nell'aggiunta della notifica: \(error.localizedDescription)")
+                } else {
+                    print("Notifica programmata con successo")
+                }
+            }
+        }
     
-    
+    func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if let error = error {
+                print("Errore nella richiesta di autorizzazione: \(error.localizedDescription)")
+            } else {
+                print("Autorizzazione concessa: \(granted)")
+            }
+        }
+    }
     
         }
  

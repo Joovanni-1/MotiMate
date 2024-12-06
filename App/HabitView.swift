@@ -20,7 +20,7 @@ struct Abitudine: Identifiable, Codable {
     var giorno: Date
     var completata: Bool
     var daysOfWeek : [Bool]
-    var completamentiGiorni :[Bool]
+    var completamentiGiorni : [Bool]
     var completamentiDate: [Date: Bool] = [:]
     var dataFineValidita: Date?
     var macroAbitudine: String
@@ -42,82 +42,6 @@ struct Abitudine: Identifiable, Codable {
 }
  
 // ViewModel per gestire le abitudini
-class AbitudiniViewModel: ObservableObject {
-    @Published var abitudini : [Abitudine] = [] {
-            didSet {
-                if let dati = try? JSONEncoder().encode(abitudini) {
-                            UserDefaults.standard.set(dati, forKey: "abitudini")
-                        }
-            }
-        }
-
-    @Published var isDeleting: Bool = false
-    
-    init() {
-            caricaDati()
-        }
-   /* init() {
-        aggiungiAbitudine(nome: "Esercizi mattutini", orario: "07:00", giorno: Date(), giorniSelezionati: [true, true, true, true, false, true, true],  macroAbitudine: "Attività Fisica")
-        }*/
-    
-    func aggiungiAbitudine(nome: String, orario: String, giorno: Date, giorniSelezionati: [Bool], macroAbitudine: String){
- 
-        let nuovaAbitudine = Abitudine(
-            nome: nome,
-            orario: orario,
-            giorno: giorno,
-            completata: false,
-            daysOfWeek : giorniSelezionati,
-            completamentiGiorni: Array(repeating: false, count: giorniSelezionati.filter { $0 }.count),
-            macroAbitudine: macroAbitudine
-        )
-        abitudini.append(nuovaAbitudine)
-        
-    }
-    
-    func eliminaAbitudine(id: UUID, daData data: Date) {
-        if let index = abitudini.firstIndex(where: { $0.id == id }) {
-            // Imposta la data di fine validità
-            abitudini[index].dataFineValidita = data - 1
-          
-        }
-    }
-    
-    func eliminaSoloPerUnGiorno(id: UUID, giorno: Date) {
-        if let index = abitudini.firstIndex(where: { $0.id == id }) {
-            
-            // credo che qua sta il problema
-            abitudini[index].completamentiDate[giorno] = false
-          
-            
-        }
-    }
-    
-    func spuntaAbitudine(id: UUID, giorno: Date) {
-        if let index = abitudini.firstIndex(where: { $0.id == id }) {
-            // Verifica lo stato attuale e alterna
-            
-            let attualeStato = abitudini[index].completamentiDate[giorno] ?? false
-            abitudini[index].completamentiDate[giorno] = !attualeStato
-            abitudini=abitudini
-            
-        }
-    }
-    
-    private func caricaDati() {
-        if let dati = UserDefaults.standard.data(forKey: "abitudini"),
-                   let abitudiniDecodificate = try? JSONDecoder().decode([Abitudine].self, from: dati) {
-            DispatchQueue.main.async{
-                self.abitudini = abitudiniDecodificate
-            }
-        } else{
-            self.abitudini = []
-        }
-        }
-    
-    
-    
-}
 
 class Constants {
     static let giorniSettimana = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"]
@@ -129,7 +53,8 @@ struct HabitView: View {
     @State private var dataCorrente = Date()
     @State private var nomeAbitudine = ""
     @State private var orarioAbitudine = ""
-    @StateObject var viewModel = AbitudiniViewModel()
+    @EnvironmentObject var viewModel: AbitudiniViewModel
+   
     @State private var giornoSelezionato: Date? = Date()
     let calendar = Calendar.current
     @State var newhabit: Bool = false
@@ -173,12 +98,14 @@ struct HabitView: View {
         }
     }
     var listaAbitudini: some View {
-        VStack {
+        
+            VStack {
             ForEach(filtraAbitudiniPerGiornoSelezionato(giornoSelezionato)) { abitudine in
                 singolaAbitudine(abitudine: abitudine)
             }
             Spacer().frame(height: 80)
         }
+        
     }
     
     // MARK: Calendario
@@ -237,6 +164,17 @@ struct HabitView: View {
     
     func singolaAbitudine(abitudine: Abitudine) -> some View {
         HStack {
+            Button(action: {
+                        if let giorno = giornoSelezionato {
+                            viewModel.spuntaAbitudine(id: abitudine.id, giorno: giorno)
+                        }
+                    }) {
+                        Image(systemName: abitudine.completamentiDate[giornoSelezionato ?? Date()] == true
+                            ? "checkmark.circle.fill"
+                            : "circle")
+                            .foregroundColor(.blue)
+                            
+                    }
             VStack(alignment: .leading) {
                 Text(abitudine.nome)
                     .font(.headline)
@@ -254,18 +192,13 @@ struct HabitView: View {
         }
         .padding()
         .background(
-            (giornoSelezionato != nil &&
-             (abitudine.completamentiDate[giornoSelezionato!] ?? false))
-                ? Color.pink.opacity(0.4)
-                : Color.white
+            abitudine.completamentiDate[giornoSelezionato ?? Date()] == true
+                       ? Color.green.opacity(0.3)
+            : Color.white
         )
         .cornerRadius(30)
         .shadow(radius: 5)
-        .onTapGesture {
-            if let giornoSelezionato = giornoSelezionato {
-                viewModel.spuntaAbitudine(id: abitudine.id, giorno: giornoSelezionato)
-            }
-        }
+       
     }
     
     func menuAbitudine(abitudine: Abitudine) -> some View {
@@ -412,7 +345,7 @@ struct HabitView: View {
 }
  
 #Preview {
-    HabitView(macroAbitudine: "Attività Fisica")
+    HabitView(macroAbitudine: "Attività Fisica").environmentObject(AbitudiniViewModel())
     // Passa un valore di esempio per macroAbitudine
              
     }
