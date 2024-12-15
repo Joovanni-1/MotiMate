@@ -86,8 +86,22 @@ struct ProfileImagePickerView: View {
     @Environment(\.presentationMode) var presentationMode
     let availableImages: [UIImage] = [
         UIImage(named: "1")!,
-        UIImage(named: "image2")!,
-        UIImage(named: "image3")! // Aggiungi le immagini che vuoi mostrare
+        UIImage(named: "2")!,
+        UIImage(named: "3")!,
+        UIImage(named: "5")!,
+        UIImage(named: "6")!,
+        UIImage(named: "7")!,
+        UIImage(named: "8")!,
+        UIImage(named: "9")!,
+        UIImage(named: "10")!,
+        UIImage(named: "11")!,
+        UIImage(named: "12")!,
+        UIImage(named: "13")!,
+        UIImage(named: "14")!,
+        UIImage(named: "16")!,
+        UIImage(named: "17")!,
+        UIImage(named: "22")!,
+        UIImage(named: "15")! // Aggiungi le immagini che vuoi mostrare
     ]
     var body: some View {
         VStack {
@@ -124,7 +138,7 @@ struct ProfileImagePickerView: View {
 // MARK: - Anteprima
 
 #Preview {
-    Goals(selected:1)
+    Goals(selected:2)
         .environmentObject(AppVariables())
      .environmentObject(AbitudiniViewModel())
    

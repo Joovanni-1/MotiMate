@@ -22,19 +22,28 @@ struct ContentView: View {
                             .frame(width: geometry.size.width, height: 1200)
                             .clipped()
                     ZStack{
-                           Text("Ciao, benvenuto su MotiMate!")
-                            .frame(width:300,height:150)
+                        
+                        
+                        Image("Moti Mate")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width:400,height:250)
+                            .offset(x: -5, y: 98)
+                        ZStack {
+                            Text("Ciao, benvenuto su MotiMate!")
+                                .frame(width:300,height:100)
                             
-                            .background(Color.verdino.opacity(0.85))
+                                .background(Color("marrone_scuro")
+                                            //.opacity(0.85)
+                                )
                             
-                                .cornerRadius(20)
+                                .cornerRadius(5)
                                 .shadow(radius: 50)
                             
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
                                 .foregroundColor(Color.white)
-                                
-                            
+                        }
                         }.padding(.bottom,400)
                         Image(systemName:"chevron.down.2")
                             .font(.system(size:60))

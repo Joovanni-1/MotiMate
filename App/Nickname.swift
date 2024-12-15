@@ -18,7 +18,7 @@ struct Nickname: View{
     @State var click: Bool = false
     @State var showAlert: Bool = false
     
-    let genders: [String]=["Maschio","Femmina","Altro  "]
+    let genders: [String]=["" ,"Maschio","Femmina","Altro  "]
     
     //MARK: BODY
     var body: some View {
@@ -39,7 +39,7 @@ struct Nickname: View{
                     .font(.custom("Avenir", size: 36))
                     .fontWeight(.heavy)
                     .multilineTextAlignment(.leading)
-                    .padding(.leading,20)
+                    .padding(.leading,5)
              //  Spacer()
                   .frame(height:300)
                 
@@ -81,24 +81,14 @@ struct Nickname: View{
                             .cornerRadius(8)
                     })
                 }
- 
-               
-               
-                
-                
-                
                 Button(action: {
                     if !variables.nickname.isEmpty && !variables.globalName.isEmpty && !variables.cognome.isEmpty &&
                         !variables.sex.isEmpty{
                         click.toggle()
-                       
-                        
+
                     }else{
                          showAlert = true
                     }
-                   
-                    
-                    
                 }, label: {
                     VStack{
                     Image(systemName:"arrowshape.forward")
@@ -119,17 +109,6 @@ struct Nickname: View{
                     .padding(.top,100)
                     .alert(isPresented: $showAlert) {
                         Alert( title: Text("Attenzione, compila i campi!"),  message: Text(""), dismissButton: .default(Text("OK")))}
-                
-                
-                    
-                /*.fullScreenCover(isPresented: $click,content:{
-                        
-                        Goals()
-                            .transition(.move(edge: .leading))
-                    })*/
-                
-
-                
             }  //fine VStack
             .padding(.horizontal)
             .offset(y:-200)
@@ -147,9 +126,6 @@ struct Nickname: View{
             // E' stata creata una subView chiamata Pickers che riporterà i valori dei Picker nella View principale
              
             Pickers
-            
-            
-            
         }
     }
     
@@ -203,21 +179,6 @@ struct Nickname: View{
    
             
         }
-        
-        
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-#Preview {
+  #Preview {
     Nickname().environmentObject(AbitudiniViewModel())
 }

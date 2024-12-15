@@ -7,7 +7,7 @@
 
 
 import SwiftUI
-import UserNotifications
+//import UserNotifications
  
 struct CreateHabitView: View {
     
@@ -34,15 +34,13 @@ struct CreateHabitView: View {
     
     
     var body: some View {
-        
-            
-           
-                NavigationView {
+        NavigationView {
                     VStack(spacing: 20) {
                         TextField("Nome abitudine", text: $nomeAbitudine)
                             .padding()
                             .background(Color(UIColor.systemGray6))
                             .cornerRadius(10)
+                           
                         HStack {
                             Button(action: {
                                 // Placeholder for an action (e.g., add icon)
@@ -62,7 +60,7 @@ struct CreateHabitView: View {
                         .padding(.horizontal)
                         VStack( spacing: 10) {
                             HStack {
-                                Text("Seleziona i giorni")                                .font(.headline)
+                                Text("Seleziona i giorni")            .font(.headline)
                                 Spacer()
                             }
                         
@@ -96,6 +94,7 @@ struct CreateHabitView: View {
                         Spacer()
                         Button(action: {
                             
+                            
                             // Se ha compilato tutti i campi aggiunge la nuova abitudine al ViewModel
                             if isFormValid {
                                 viewModel.aggiungiAbitudine(
@@ -105,7 +104,8 @@ struct CreateHabitView: View {
                                     giorniSelezionati: giorniSelezionati,
                                     macroAbitudine: macroAbitudine
                                 )
-                                scheduleNotification()
+                                
+                                //scheduleNotification()
                                 presentationMode.wrappedValue.dismiss()
                             }else{
                                 showAlert = true
@@ -125,13 +125,11 @@ struct CreateHabitView: View {
                     }
                     
                     .padding()
-                    .navigationTitle("Create a Habit")
-                    .navigationBarItems(leading: Button("Cancel") {
+                    .navigationTitle("Crea un'abitudine")
+                    .navigationBarItems(leading: Button("Annulla") {
                         presentationMode.wrappedValue.dismiss()
                     })
-                    .onAppear {
-                        requestNotificationPermission() // Richiede l'autorizzazione per le notifiche
-                    }
+                    //.onAppear {requestNotificationPermission() // Richiede l'autorizzazione per le notifiche}
                 }
             }
     
@@ -139,7 +137,7 @@ struct CreateHabitView: View {
     
     //MARK: FUNZIONI
     // Funzione per programmare la notifica
-        func scheduleNotification() {
+     /*   func scheduleNotification() {
             let content = UNMutableNotificationContent()
             content.title = "Promemoria Abitudine"
             content.body = "È ora di completare l'abitudine: \(nomeAbitudine)"
@@ -170,7 +168,7 @@ struct CreateHabitView: View {
                 print("Autorizzazione concessa: \(granted)")
             }
         }
-    }
+    }*/
     
         }
  

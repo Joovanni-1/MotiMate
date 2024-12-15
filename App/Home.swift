@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct Home: View {
-    @Binding var selected: Int
     @EnvironmentObject var variables: AppVariables
     @Binding var showTabView: Bool
     @EnvironmentObject var viewModel: AbitudiniViewModel
@@ -18,8 +17,18 @@ struct Home: View {
     @State var isAddingNewHabit: Bool = false
     @State var page1: Bool = false
     var body: some View {
-        NavigationView{
+       
             ScrollView{
+                
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Benvenuto:\(variables.nickname)")
+                        .font(.largeTitle)
+                        .bold()
+                        .padding(.top, 32)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading)
+                
                 Button(action:{
                     isAddingNewHabit.toggle()
                 },label:{ Image(systemName:"plus")
@@ -27,11 +36,11 @@ struct Home: View {
                         .bold()
                 })
                 .frame(width:40,height:40)
-                .background(Color.mint)
+                .background(Color.moss)
                 .cornerRadius(50)
                 .shadow(radius: 5)
                 .overlay(Circle().stroke(Color.black,lineWidth:0.5))
-                .offset(x: 150,y:-120)
+                .offset(x: 150,y:-107)
                 
                 if isAddingNewHabit {
                     
@@ -56,7 +65,7 @@ struct Home: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.mint)
+                            .background(Color.moss)
                             .cornerRadius(10)
                     })
                     .padding(.horizontal)
@@ -69,57 +78,71 @@ struct Home: View {
                             .foregroundColor(.red)
                     })
                     .padding(.horizontal)
-                
+                    
                     //fine v stack
                 }
-               
-               
+                
+                
                 
                 ForEach (habits, id:\.self){ habit in
-                        
-                     NavigationLink(destination: destinationView(for: habit)
+                    
+                    NavigationLink(destination: destinationView(for: habit)
                         .onAppear {
-                         showTabView = false // Nascondi TabView
-                     }
-                     .onDisappear {
-                         showTabView = true // Mostra TabView al ritorno
-                     }, label: {
-                        RoundedRectangle(cornerRadius:20)
-                            .fill(Color.mint)
-                            .stroke(Color.black, lineWidth:2)
-                            .overlay(
-                                HStack{
-                                    Spacer()
-                                    Text(habit)
-                                        .font(.title)
-                                    Spacer()
-                                    SVGtoSwiftUIView(divisions:5, completation: 3)
+                            showTabView = false // Nascondi TabView
+                            viewModel.resetGiornoSelezionato()
+                        }
+                        .onDisappear {
+                            showTabView = true // Mostra TabView al ritorno
+                        }, label: {
+                            
+                            RoundedRectangle(cornerRadius:20)
+                                .fill(Color.moss)
+                                .stroke(Color.black, lineWidth:2)
+                                
+                                .overlay(
+                                    HStack{
+                                        Spacer()
+                                        Text(habit)
+                                            .font(.system(size: 26))
+                                            .bold()
+                                        Spacer()
+                                        //SVGtoSwiftUIView(divisions:5, completation: 3)
+                                        let progress = viewModel.progressForCategory(habit, forDay: viewModel.giornoCorrente)
+                                        SVGtoSwiftUIView(divisions: progress.totale, completation: progress.completate)
                                         
                                         
-                                })
-                            .frame(maxWidth:.infinity)
-                            .frame(height:180)
-                    }
-       )
+                                    })
+                                .frame(maxWidth:.infinity)
+                                .frame(height:180)
+                                .padding([.leading, .trailing], 9)
+                        }
+                    )
                 }
                 
-
-                   /* per ogni macro categoria creare una pagina (che deve essere uguale per tutti)
-                    con calendario, grafici, to-do list ()
-                    nel caso di classifiche aggiungere nella tab view un icona
-                    */
+                
+                /* per ogni macro categoria creare una pagina (che deve essere uguale per tutti)
+                 con calendario, grafici, to-do list ()
+                 nel caso di classifiche aggiungere nella tab view un icona
+                 */
                 
                 
+                
+                
+            }
             
-                
-            }.navigationTitle("Benvenuto:\(variables.nickname)")
-              //fine scroll
-        }//fine nav
+           
+        
     }
     
     @ViewBuilder
     func destinationView(for habit: String) -> some View {
-        HabitView(macroAbitudine: habit)// Passa il nome della macroabitudine
+        switch habit {
+        case "Risparmiare":
+            Risparmio()
+        default:
+            HabitView(macroAbitudine: habit)// Passa il nome della macroabitudine
+        }
+    
     }
    
 }
@@ -161,7 +184,7 @@ struct SVGtoSwiftUIView: View {
                         path.move(to: CGPoint(x: 93, y: 93)) // Centro
                         path.addLine(to: CGPoint(x: startX, y: startY))
                     }
-                    .stroke(Color.mint, lineWidth: 8)
+                    .stroke(Color.moss, lineWidth: 8)
                     .overlay(Text("\(completation) / \(divisions)")
                         .font(.system(size: 20))
                         .bold()
@@ -172,6 +195,7 @@ struct SVGtoSwiftUIView: View {
             
             
         }
+    
     }
 
 

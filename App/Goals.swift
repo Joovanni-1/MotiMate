@@ -16,35 +16,44 @@ struct Goals: View {
     // ricordati che Risparmiare avrà un altra schermata
     
     @State var selected: Int = 0
-    @State var selected1: Int = 1
     @State private var showTabView = true
     var body: some View {
         
         NavigationStack{
             if showTabView {
                 TabView(selection: $selected){
-                    Home(selected:$selected, showTabView: $showTabView)
+                    Home(showTabView: $showTabView)
                         .tabItem{
                             VStack{
                                 
                                 Image(systemName: "house")
                                 
                                 
-                            }.tag(0)
-                        }
-                    Profile() 
+                            }
+                        }.tag(0)
+                    Streak()
                         .tabItem{
-                            VStack {Spacer() .frame(height: 20)
-                                Image(systemName: "person")
+                            VStack{
+                                
+                                Image(systemName: "flame.fill")
+                                
                                 
                             }
                         }.tag(1)
+                    Profile()
+                        .tabItem{
+                            VStack {
+                                Spacer() .frame(height: 20)
+                                Image(systemName: "person")
+                                
+                            }
+                        }.tag(2)
                     Settings()
                         .tabItem{
                             VStack {Spacer().frame(height: 20)
                                 Image(systemName: "gear")
                             }
-                        }.tag(2)
+                        }.tag(3)
                 }
             } else {
                     EmptyView() // Nasconde la TabView
