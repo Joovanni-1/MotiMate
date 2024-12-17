@@ -29,7 +29,32 @@ struct Nickname: View{
             //backgroung
             Color.bluino
                 .edgesIgnoringSafeArea(.all)
-            
+            ZStack{
+                ZStack{
+                    Rectangle()
+                        .fill(Color.white)
+                        .frame(width: 47, height: 47)
+                        .offset(x: 20,y: -257)
+                    VStack{
+                        Spacer().frame(height: 100)
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.white.opacity(0.8))
+                            .stroke( Color.white, lineWidth: 5)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 300)
+                        
+                        
+                        Image("castoro_nickname")
+                            .resizable()
+                            .frame(width: 200, height: 200)
+                            .offset(y: -467)
+                         
+                        
+                        
+                    }
+                }
+                .padding(8)
+                
             // foreground
             VStack{
                 Spacer()
@@ -40,8 +65,8 @@ struct Nickname: View{
                     .fontWeight(.heavy)
                     .multilineTextAlignment(.leading)
                     .padding(.leading,5)
-             //  Spacer()
-                  .frame(height:300)
+               
+                    .frame(height:300)
                 
                 TextField("Nickname", text: $variables.nickname )
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -84,35 +109,41 @@ struct Nickname: View{
                 Button(action: {
                     if !variables.nickname.isEmpty && !variables.globalName.isEmpty && !variables.cognome.isEmpty &&
                         !variables.sex.isEmpty{
-                        click.toggle()
-
+                      
+                        let isSaved = UserDefaultsManager.shared.saveUser(variables)
+                        if isSaved {
+                            click.toggle()
+                        
                     }else{
-                         showAlert = true
+                        showAlert = true
                     }
-                }, label: {
+                } else{
+                    showAlert = true
+                }}, label: {
                     VStack{
-                    Image(systemName:"arrowshape.forward")
-                    Text("Avanti")
-                }
+                        Image(systemName:"arrowshape.forward")
+                        Text("Avanti")
+                    }
                     
                 })
                 .frame(width:200,height:80)
                 
                 .background( !variables.nickname.isEmpty && !variables.globalName.isEmpty && !variables.cognome.isEmpty &&
                              !variables.sex.isEmpty ? Color.blue : Color.gray)
-                    .cornerRadius(20)
-                    .shadow(radius: 50)
-                    .offset(y:50)
-                    .font(.system(size:26))
-                    .fontWeight(.bold)
-                    .foregroundColor(Color.white)
-                    .padding(.top,100)
-                    .alert(isPresented: $showAlert) {
-                        Alert( title: Text("Attenzione, compila i campi!"),  message: Text(""), dismissButton: .default(Text("OK")))}
+                .cornerRadius(20)
+                .shadow(radius: 50)
+                .offset(y:50)
+                .font(.system(size:26))
+                .fontWeight(.bold)
+                .foregroundColor(Color.white)
+                .padding(.top,100)
+                .alert(isPresented: $showAlert) {
+                    Alert( title: Text("Attenzione, compila tutti i campi o usa un nickname diverso!"),  message: Text(""), dismissButton: .default(Text("OK")))}
+                
             }  //fine VStack
             .padding(.horizontal)
             .offset(y:-200)
-         
+        }
             ZStack {
                 if click {
                     Goals()
@@ -181,4 +212,5 @@ struct Nickname: View{
         }
   #Preview {
     Nickname().environmentObject(AbitudiniViewModel())
+          .environmentObject(RisparmioViewModel())
 }

@@ -30,8 +30,8 @@ struct CreateHabitView: View {
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: _date )
     }
-
-    
+   
+    //@State private var showReminderScreen: Bool = false
     
     var body: some View {
         NavigationView {
@@ -43,11 +43,12 @@ struct CreateHabitView: View {
                            
                         HStack {
                             Button(action: {
-                                // Placeholder for an action (e.g., add icon)
+                                //showReminderScreen = true
                             }) {
                                 Image(systemName: "bell")
                                     .foregroundColor(.blue)
                             }
+                           
                             Spacer()
                             Button(action: {
                                 // Placeholder for an action (e.g., pick color)

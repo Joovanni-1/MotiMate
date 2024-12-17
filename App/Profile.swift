@@ -12,97 +12,107 @@ import SwiftUI
 
 struct Profile: View {
     @EnvironmentObject var variables: AppVariables
-    var sfondoP: Color = Color("azzurrino")
-    @State private var photoImage: Image = Image(systemName: "person")
+    var sfondoP: Color = Color(.white)
+    @State private var photoImage: Image = Image(systemName: "person") // Immagine di default
     @State private var isPickerPresented: Bool = false // Stato per il picker
+ 
+    // Chiave per UserDefaults
+    private let profileImageKey = "profileImageKey"
  
     var body: some View {
         ZStack {
-            Rectangle()
-                .frame(height: 650)
-                .frame(maxWidth: .infinity)
-                .foregroundColor(sfondoP)
-                .cornerRadius(30)
-                .padding()
-                .offset(y: 20)
-            Circle()
-                .stroke(sfondoP, lineWidth: 10)
-                .background(Color.white)
-                .frame(width: 150, height: 150)
-                .cornerRadius(150)
-                .foregroundColor(Color.white)
-                .offset(y: -280)
-                .overlay(
-                    photoImage
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 140, height: 140)
-                        .clipShape(Circle()) // Per mantenere l'aspetto circolare
-                        .offset(y: -280)
-                )
-            ZStack{
-                Button(action: {
-                isPickerPresented = true // Mostra il photo picker
-            }, label: {
-                Image(systemName: "camera")
-                    .background(
-                        Circle()
-                            .stroke(sfondoP, lineWidth: 1)
-                            .frame(width: 30, height: 30)
-                            .background(Color.white)
-                            .cornerRadius(150)
-                    )
-                    .frame(width: 100, height: 100)
+            LinearGradient(colors: [.moss, Color("bluino")], startPoint: .top, endPoint: .bottom)
+                .edgesIgnoringSafeArea(.all)
+            ZStack {
+                Rectangle()
+                    .frame(height: 450)
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(sfondoP)
+                    .cornerRadius(30)
+                    .padding()
+ 
+                Circle()
+                    .stroke(sfondoP, lineWidth: 10)
+                    .background(Color.white)
+                    .frame(width: 150, height: 150)
                     .cornerRadius(150)
-                
-            })
-            }.offset(x: 48, y: -230)
-            VStack(spacing: 30) {
-                capsuletta.overlay(Text(variables.globalName))
-                capsuletta.overlay(Text(variables.cognome))
-                capsuletta.overlay(Text(variables.sex))
-                capsuletta.overlay(Text("\(variables.age)"))
-            }
-        }
-        .sheet(isPresented: $isPickerPresented) {
-            ProfileImagePickerView { selectedImage in
-                if let selectedImage = selectedImage {
-                    photoImage = Image(uiImage: selectedImage)
+                    .foregroundColor(Color.white)
+                    .offset(y: -250)
+                    .overlay(
+                        photoImage
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 140, height: 140)
+                            .clipShape(Circle())
+                            .offset(y: -250)
+                    )
+ 
+                ZStack {
+                    Button(action: {
+                        isPickerPresented = true // Mostra il photo picker
+                    }, label: {
+                        Image(systemName: "camera")
+                            .accentColor(.black)
+                            .background(
+                                Circle()
+                                    .stroke(sfondoP, lineWidth: 1)
+                                    .frame(width: 30, height: 30)
+                                    .background(Color.white)
+                                    .cornerRadius(150)
+                            )
+                            .frame(width: 100, height: 100)
+                            .cornerRadius(150)
+                    })
+                }.offset(x: 48, y: -200)
+ 
+                VStack(spacing: 30) {
+                    capsuletta.overlay(Text(variables.globalName))
+                    capsuletta.overlay(Text(variables.cognome))
+                    capsuletta.overlay(Text(variables.sex))
+                    capsuletta.overlay(Text("\(variables.age)"))
                 }
             }
+            .sheet(isPresented: $isPickerPresented) {
+                ProfileImagePickerView { selectedImageName in
+                    if let selectedImageName = selectedImageName {
+                        saveImageName(selectedImageName) // Salva il nome dell'immagine selezionata
+                        photoImage = Image(selectedImageName)
+                    }
+                }
+            }
+            .shadow(radius: 5)
+            .onAppear {
+                loadImageName() // Carica il nome dell'immagine salvata all'avvio
+            }
         }
-        .shadow(radius: 5)
     }
+ 
     var capsuletta: some View {
         Capsule()
             .frame(width: 300, height: 40)
             .foregroundColor(Color.white)
     }
+ 
+    // MARK: - Salvataggio nome immagine
+    private func saveImageName(_ imageName: String) {
+        UserDefaults.standard.set(imageName, forKey: profileImageKey)
+    }
+ 
+    // MARK: - Caricamento nome immagine
+    private func loadImageName() {
+        if let savedImageName = UserDefaults.standard.string(forKey: profileImageKey) {
+            photoImage = Image(savedImageName)
+        }
+    }
 }
  
 // MARK: - Photo Picker View
 struct ProfileImagePickerView: View {
-    let onImageSelected: (UIImage?) -> Void
+    let onImageSelected: (String?) -> Void
     @Environment(\.presentationMode) var presentationMode
-    let availableImages: [UIImage] = [
-        UIImage(named: "1")!,
-        UIImage(named: "2")!,
-        UIImage(named: "3")!,
-        UIImage(named: "5")!,
-        UIImage(named: "6")!,
-        UIImage(named: "7")!,
-        UIImage(named: "8")!,
-        UIImage(named: "9")!,
-        UIImage(named: "10")!,
-        UIImage(named: "11")!,
-        UIImage(named: "12")!,
-        UIImage(named: "13")!,
-        UIImage(named: "14")!,
-        UIImage(named: "16")!,
-        UIImage(named: "17")!,
-        UIImage(named: "22")!,
-        UIImage(named: "15")! // Aggiungi le immagini che vuoi mostrare
-    ]
+    let availableImages: [String] = [
+        "1", "2", "3", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "16", "17", "22", "15"
+    ] // Nomi delle immagini disponibili nell'app
     var body: some View {
         VStack {
             Text("Seleziona un'immagine")
@@ -110,12 +120,12 @@ struct ProfileImagePickerView: View {
                 .padding()
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    ForEach(availableImages, id: \.self) { image in
+                    ForEach(availableImages, id: \.self) { imageName in
                         Button(action: {
-                            onImageSelected(image)
+                            onImageSelected(imageName) // Passa il nome dell'immagine selezionata
                             presentationMode.wrappedValue.dismiss()
                         }) {
-                            Image(uiImage: image)
+                            Image(imageName)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 150, height: 150)
@@ -132,9 +142,9 @@ struct ProfileImagePickerView: View {
             .padding()
         }
     }
-     
 }
- 
+
+
 // MARK: - Anteprima
 
 #Preview {

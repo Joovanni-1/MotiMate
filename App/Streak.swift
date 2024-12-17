@@ -30,125 +30,143 @@ struct Streak: View {
         }
     var body: some View {
         ZStack{
-            //Image("prato").resizable().scaledToFit().ignoresSafeArea()
-            
+            LinearGradient(colors: [.moss, Color("bluino")], startPoint: .top, endPoint: .bottom)
+                .edgesIgnoringSafeArea(.all)
             VStack(alignment: .leading, spacing: 20) {
-            
-            Text("Streak")
-                .font(.largeTitle)
-                .bold()
-                .padding(.top, 25)
-            
-            
-            Text("Mese di \(meseCorrenteInItaliano())")
-                .font(.title)
-                .bold()
-                .padding(.top, 20)
-            
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
-                ForEach(giorniDelMese, id: \ .self) { giorno in
-                    let questione = viewModel.streakGiorni.contains(where: { Calendar.current.isDate($0, inSameDayAs: giorno) })
-                    Circle()
-                        .stroke(questione ? Color.clear : Color.gray, lineWidth: 1)
-                        .background( questione ? Image("tronchetto").resizable().scaledToFill().frame(width:55) : nil )
+                Spacer().frame(height: 30)
+                Text("Streak")
+                    .font(.largeTitle)
+                    .bold()
                     
-                    
-                        .overlay(
-                            Text("\(calendar.component(.day, from: giorno))")
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            
-                        )
-                        .frame(width: 38)
-                    
-                        .onTapGesture {
-                            viewModel.giornoSelezionato = giorno
-                        }
-                    
-                    
-                }
-            }
-            HStack{
-                Spacer()
-                VStack(alignment: .center, spacing: 20) {
-                    
-                    
-                    // Cerchio centrale per lo streak
-                    ZStack {
-                        Circle()
-                            .stroke(Color.pink.opacity(0.3), lineWidth: 15)
-                            .frame(width: 120, height: 120)
-                        Circle()
-                            .trim(from: 0, to: CGFloat(min(Double(viewModel.calcolaStreakConsecutivo()) / 30.0, 1.0))) // Massimo 30 giorni
-                            .stroke(Color.pink, style: StrokeStyle(lineWidth: 15, lineCap: .round))
-                            .frame(width: 150, height: 150)
-                            .rotationEffect(Angle(degrees: -90))
-                        VStack {
-                            Text("\(viewModel.calcolaStreakConsecutivo())")
-                                .font(.system(size: 40, weight: .bold))
-                                .foregroundColor(.pink)
-                            Text("Giorni")
-                                .font(.headline)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    .padding(.bottom, 20)
-                }
-                VStack {
-                    Image(systemName: "checklist") // Puoi sostituirlo con un'icona personalizzata
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 40, height: 40)
-                        .foregroundColor(.green)
-                    
-                    Text("\(viewModel.totaleHabitsCompletate())")
-                        .font(.largeTitle)
-                        .bold()
-                    
-                    Text("Habits Done")
-                        .font(.headline)
-                        .foregroundColor(.gray)
-                }
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding()
+                    .padding([.leading])
                 
-                Spacer()
-                
-            }
-            HStack{
-                Spacer()
-                VStack{
-                    Image(systemName: "flame.fill")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 57, height: 57)
-                        .foregroundStyle( RadialGradient(colors: [Color.yellow, Color.orange, Color.red, Color.red], center: .init(x: 0.5, y:0.7), startRadius: 0, endRadius: 45)
-                        )
-                        .overlay( Text(" \(viewModel.maxStreak) ")
+                ZStack{
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(Color.white)
+                        .opacity(0.6)
+                        .frame(maxWidth: .infinity)
+                        .frame( height: 600)
+                        
+                        
+                        
+                        
+                        .cornerRadius(20)
+                    VStack(alignment: .leading, spacing: 20) {
+                        
+                        Text("Mese di \(meseCorrenteInItaliano())")
                             .font(.title)
                             .bold()
-                            .offset(y: 13))
-                    
-                    
-                    Text("Massimo Streak: \(viewModel.maxStreak) ")
-                        .font(.headline)
-                        .foregroundColor(.blue)
-                        .padding(10)
-                    
-                }
-                Spacer()
-            }
-            /*Button(action: {
-             viewModel.resetHabitsDone()
-             }, label: {
-             Text("Reset Habits Done")
-             .foregroundColor(.red)
-             .padding()
-             .background(Capsule().stroke(Color.red, lineWidth: 2))
-             })
-             .padding(.top, 20)*/
-        }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                            .padding(.top, 20)
+                        
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
+                            ForEach(giorniDelMese, id: \ .self) { giorno in
+                                let questione = viewModel.streakGiorni.contains(where: { Calendar.current.isDate($0, inSameDayAs: giorno) })
+                                Circle()
+                                    .stroke(questione ? Color.clear : Color.gray, lineWidth: 2)
+                                    .background( questione ? Image("tronchetto").resizable().scaledToFill().frame(width:55) : nil )
+                                   .shadow(radius: 3)
+                                    
+                                
+                                    .overlay(
+                                        Text("\(calendar.component(.day, from: giorno))")
+                                            
+                                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                        
+                                    )
+                                    .frame(width: 38)
+                                
+                                    .onTapGesture {
+                                        viewModel.giornoSelezionato = giorno
+                                    }
+                                
+                                
+                            }
+                        }
+                        HStack{
+                            Spacer()
+                            VStack(alignment: .center, spacing: 20) {
+                                
+                                
+                                // Cerchio centrale per lo streak
+                                ZStack {
+                                    Circle()
+                                        .stroke(Color("bluino").opacity(0.3), lineWidth: 15)
+                                        .frame(width: 120, height: 120)
+                                    Circle()
+                                        .trim(from: 0, to: CGFloat(min(Double(viewModel.calcolaStreakConsecutivo()) / 30.0, 1.0))) // Massimo 30 giorni
+                                        .stroke(Color.ocean, style: StrokeStyle(lineWidth: 15, lineCap: .round))
+                                        .frame(width: 150, height: 150)
+                                        .rotationEffect(Angle(degrees: -90))
+                                    VStack {
+                                        Text("\(viewModel.calcolaStreakConsecutivo())")
+                                            .font(.system(size: 40, weight: .bold))
+                                            .foregroundColor(.ocean)
+                                        Text("Giorni")
+                                            .font(.headline)
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                                .padding(.bottom, 20)
+                            }
+                            VStack {
+                                Image(systemName: "checklist") // Puoi sostituirlo con un'icona personalizzata
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 40, height: 40)
+                                    .foregroundColor(.green)
+                                
+                                Text("\(viewModel.totaleHabitsCompletate())")
+                                    .font(.largeTitle)
+                                    .bold()
+                                
+                                Text("Habits Done")
+                                    .font(.headline)
+                                    .foregroundColor(.gray)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding()
+                            
+                            Spacer()
+                            
+                        }
+                        HStack{
+                            Spacer()
+                            VStack{
+                                Image(systemName: "flame.fill")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 57, height: 57)
+                                    .foregroundStyle( RadialGradient(colors: [Color.yellow, Color.orange, Color.red, Color.red], center: .init(x: 0.5, y:0.7), startRadius: 0, endRadius: 45)
+                                    )
+                                    .overlay( Text(" \(viewModel.maxStreak) ")
+                                        .font(.title)
+                                        .bold()
+                                        .offset(y: 13))
+                                
+                                
+                                Text("Massimo Streak: \(viewModel.maxStreak) ")
+                                    .font(.headline)
+                                    .foregroundColor(.blue)
+                                    .padding(10)
+                                
+                            }
+                            Spacer()
+                        }
+                        /*Button(action: {
+                         viewModel.resetHabitsDone()
+                         }, label: {
+                         Text("Reset Habits Done")
+                         .foregroundColor(.red)
+                         .padding()
+                         .background(Capsule().stroke(Color.red, lineWidth: 2))
+                         })
+                         .padding(.top, 20)*/
+                    }
+                    .padding()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                }.padding()
+        } // fine Vstack
+        
         .onAppear{
             viewModel.aggiornaStreak()
         }
@@ -157,6 +175,8 @@ struct Streak: View {
         
         
     }
+        
+        
 }
 
 
@@ -166,7 +186,9 @@ struct Streak: View {
     Goals(selected:1)
         .environmentObject(AppVariables())
      .environmentObject(AbitudiniViewModel())
+     .environmentObject(RisparmioViewModel())
 }
+
 
 
 

@@ -11,10 +11,18 @@ import UserNotifications
 import SDWebImageSwiftUI
 
 struct Settings: View {
-    @State private var isDarkMode: Bool = false
+    @State private var isDarkMode: Bool = UserDefaults.standard.bool(forKey: "isDarkMode")
     @State private var showAboutUs: Bool = false
     @State private var showReminderScreen: Bool = false
-    @State private var reminders: [Reminder] = []
+    
+    @State private var showGIF = false // Stato per mostrare la GIF
+    @State private var displayedMessage = "" // Messaggio visualizzato progressivamente
+    @State private var fullMessage: String = UserDefaults.standard.string(forKey: "savedFullMessage") ?? "Guarda il castoro in azione!"
+    @State private var reminders: [Reminder] = Reminder.loadFromUserDefaults()
+    @State private var buttonEnabled = true // Stato per controllare il bottone
+    @State private var hasClicked: Bool = UserDefaults.standard.bool(forKey: "hasClicked") // Stato per il primo clic
+    @State private var showSheet = false // Stato per mostrare il foglio modale (sheet)
+    @State private var firstTypingEffectDone = false
 
     var body: some View {
        
@@ -29,7 +37,29 @@ struct Settings: View {
                     .padding(.leading,3)
                 // Set Reminder Button
                 Button(action: {
-                    showReminderScreen.toggle()
+                    if !hasClicked {
+                        showGIF = true
+                        hasClicked = true
+                        saveHasClicked()
+                        fullMessage = "Guarda il castoro in azione!" // Messaggio iniziale
+                        typeMessage()
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 7.0) {
+                            showReminderScreen = true
+                        }
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                            showGIF = false
+                            fullMessage = "Spero ti sia piaciuto il castoro!"
+                            typeMessage()
+                            saveMessage()
+                        }
+                    } else {
+                        // Nei click successivi, mostra direttamente il foglio modale
+                        fullMessage = "Spero ti sia piaciuto il castoro!"
+                        
+                        showReminderScreen = true
+                    }
                 }) {
                     HStack {
                         Image(systemName: "bell")
@@ -45,7 +75,7 @@ struct Settings: View {
                     ReminderView(reminders: $reminders)
                 }
 
-                // List of Reminders
+                
 
                 // Theme Toggle
                 VStack(alignment: .leading, spacing: 10) {
@@ -62,9 +92,17 @@ struct Settings: View {
                 .background(Color(UIColor.secondarySystemBackground))
                 .cornerRadius(10)
 
-                
-                Spacer()
-                    .frame(height: 250)
+               /* Button(action: {
+                    resetHasClicked()
+                }) {
+                    Text("Reset HasClicked")
+                        
+                        .padding()
+                        .background(Color.red)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }*/
+                Castoro
                 // Share App Bottone
                 Button(action: {
                     shareApp()
@@ -96,8 +134,8 @@ struct Settings: View {
                 }
                 .alert(isPresented: $showAboutUs) {
                     Alert(
-                        title: Text("About Us"),
-                        message: Text("We are a team dedicated to helping you build and track your habits for a better life."),
+                        title: Text("Chi siamo❓"),
+                        message: Text("Siamo un team di studenti di ingegneria Informatica che ha come obiettivo quello di motivare gli utenti a sviluppare sane abitudini per condurre una vita più.... "),
                         dismissButton: .default(Text("Close"))
                     )
                 }
@@ -105,18 +143,77 @@ struct Settings: View {
                 Spacer()
             }
             .padding()
-            
+            .onAppear{loadMessage()}
         
     }
 
+    var Castoro : some View{
+        ZStack {
+            HStack {
+                ZStack {
+                    Image("castoro_static") // Immagine statica iniziale
+                        .resizable()
+                        .scaledToFit()
+                    if showGIF {
+                        AnimatedImage(name: "castoro.gif")
+                            .resizable()
+                            .scaledToFit()
+                    }
+                    if !displayedMessage.isEmpty {
+                        ZStack {
+                            Image("rb_115959") // Nuvoletta di fumetto caricata
+                                .resizable()
+                                .frame(width: 300, height: 200) // Dimensione della nuvoletta
+                            Text(displayedMessage) // Testo sopra la nuvoletta
+                                .font(.headline)
+                                .multilineTextAlignment(.leading)
+                                .padding()
+                                .frame(width: 150, height: 200)// Dimensione del testo
+                        }
+                        .offset(x: 170, y: 10) // Posiziona la nuvoletta sopra il castoro
+                    }
+                }
+                .frame(width: 200, height: 200)
+                .padding()
+                Spacer()
+                    .frame(width: 200)
+            }
+        }
+    }
     
-    
+    private func saveDarkModePreference() {
+            UserDefaults.standard.set(isDarkMode, forKey: "isDarkMode")
+        }
+        private func saveHasClicked() {
+            UserDefaults.standard.set(hasClicked, forKey: "hasClicked")
+        }
+    private func saveMessage() {
+        UserDefaults.standard.set(fullMessage, forKey: "savedFullMessage")
+        UserDefaults.standard.set(displayedMessage, forKey: "savedDisplayedMessage")
+    }
+    func loadMessage() {
+        fullMessage = UserDefaults.standard.string(forKey: "savedFullMessage") ?? ""
+        displayedMessage = UserDefaults.standard.string(forKey: "savedDisplayedMessage") ?? ""
+    }
+    func typeMessage() {
+        displayedMessage = ""
+        for (index, char) in fullMessage.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.1) {
+                displayedMessage.append(char)
+                saveMessage()
+            }
+        }
+    }
     private func shareApp() {
-        let appLink = "https://www.yourapp.com"
-        let activityVC = UIActivityViewController(activityItems: ["Check out this amazing Habit Tracker app!", appLink], applicationActivities: nil)
+        let appLink = "https://www.motimate.com"
+        let activityVC = UIActivityViewController(activityItems: ["Scarica questa fantastica app per le abitudini", appLink], applicationActivities: nil)
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
             windowScene.windows.first?.rootViewController?.present(activityVC, animated: true, completion: nil)
         }
+    }
+    func resetHasClicked() {
+        UserDefaults.standard.removeObject(forKey: "hasClicked") // Rimuove il valore salvato
+        hasClicked = false // Aggiorna lo stato locale
     }
 }
 
@@ -190,6 +287,7 @@ struct ReminderView: View {
         let newReminder = Reminder(name: notificationName.isEmpty ? "Reminder" : notificationName, time: notificationTime)
         reminders.append(newReminder)
         scheduleNotification(for: newReminder)
+        Reminder.saveToUserDefaults(reminders)
         notificationName = ""
         showTimePicker = false
     }
@@ -199,6 +297,7 @@ struct ReminderView: View {
                 let reminder = reminders[index]
                 deleteReminder(reminder)
             }
+        Reminder.saveToUserDefaults(reminders)
         }
     private func deleteReminder(_ reminder: Reminder) {
            reminders.removeAll { $0.id == reminder.id }
@@ -225,16 +324,24 @@ struct ReminderView: View {
     }
 }
 
-struct Reminder: Identifiable {
+struct Reminder: Identifiable, Codable {
     let id = UUID()
     let name: String
     let time: Date
+    
+    static func loadFromUserDefaults() -> [Reminder] {
+        if let data = UserDefaults.standard.data(forKey: "reminders"),
+           let reminders = try? JSONDecoder().decode([Reminder].self, from: data) {
+            return reminders
+        }
+        return []
+    }
+    static func saveToUserDefaults(_ reminders: [Reminder]) {
+        if let data = try? JSONEncoder().encode(reminders) {
+            UserDefaults.standard.set(data, forKey: "reminders")
+        }
+    }
 }
-
-
-
-
-
 #Preview {
     Goals(selected:3)
         .environmentObject(AppVariables())

@@ -178,6 +178,8 @@ struct HabitView: View {
         HStack {
             Button(action: {
                 viewModel.spuntaAbitudine(id: abitudine.id, perGiorno: viewModel.giornoSelezionato ?? Date())
+                
+                
                     }) {
                         Image(systemName: abitudine.completamentiDate[viewModel.giornoSelezionato ?? Date()] == true
                             ? "checkmark.circle.fill"

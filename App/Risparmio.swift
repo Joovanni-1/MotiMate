@@ -7,45 +7,50 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
+import AVFoundation
+
+struct CompletedGoal: Codable {
+    let goalAmount: Double
+    let currentSavings: Double
+}
 
 struct Risparmio: View {
-    @State private var goalAmount: Double? = nil // L'importo dell'obiettivo
-    @State private var currentSavings: Double = 0 // Il totale dei risparmi accumulati
-    @State private var newGoalAmount: String = "" // Input per il nuovo obiettivo
-    @State private var savingAmount: String = "" // Input per aggiungere risparmi
-    @State private var completedGoals: [(goalAmount: Double, currentSavings: Double)] = [] // Cronologia obiettivi completati
+    @EnvironmentObject var viewModel: RisparmioViewModel
     
+    
+    @State private var newGoalAmount: String = ""
+    @State private var savingAmount: String = ""
     @State private var isNavigatingToHistory = false
-    @State private var showGif : Bool
+    @State private var showGif: Bool
     
     init(showGif: Bool = false) { // Costruttore per la preview
-           _showGif = State(initialValue: showGif)
-       }
-
-
+        _showGif = State(initialValue: showGif)
+    }
+    
+    
     var body: some View {
         NavigationView {
             ZStack{
                 RadialGradient(gradient: Gradient(colors: [.blue,.green, .white]),  center: .bottomLeading, startRadius: 0,endRadius: 1500).edgesIgnoringSafeArea(.all)
                 VStack {
-                    if goalAmount == nil{ CreateGoalView(newGoalAmount: $newGoalAmount, setGoal: setGoal) }else {
+                    if viewModel.goalAmount == nil{ CreateGoalView(newGoalAmount: $viewModel.newGoalAmount, setGoal: viewModel.setGoal) }else {
                         // Visualizzazione dell'obiettivo corrente
                         CurrentGoalView(
-                            goalAmount: goalAmount!,
-                            currentSavings: $currentSavings,
-                            savingAmount: $savingAmount,
-                            addSavings: addSavings,
-                            showGif: $showGif,
-                            resetGoal: resetGoal
+                            goalAmount: viewModel.goalAmount!,
+                            currentSavings: $viewModel.currentSavings,
+                            savingAmount: $viewModel.savingAmount,
+                            addSavings: viewModel.addSavings,
+                            showGif: $viewModel.showGif,
+                            resetGoal: viewModel.resetGoal
                         )
                     }
                     Spacer()
                     // Cronologia degli obiettivi completati
-                    NavigationLink(destination: HistoryView(completedGoals: $completedGoals), isActive: $isNavigatingToHistory) {
-                                        EmptyView()
-                                    }
+                    NavigationLink(destination: HistoryView(completedGoals: $viewModel.completedGoals), isActive: $viewModel.isNavigatingToHistory) {
+                        EmptyView()
+                    }
                     Button(action: {
-                        isNavigatingToHistory = true
+                        viewModel.isNavigatingToHistory = true
                     }) {
                         Text("Cronologia")
                             .frame(width: 100, height: 20)
@@ -56,9 +61,9 @@ struct Risparmio: View {
                             .shadow(radius: 5)
                     }
                     .padding(.top)
-                    .disabled(completedGoals.isEmpty)
-                                    
-                                    
+                    .disabled(viewModel.completedGoals.isEmpty)
+                    
+                    
                 }
                 .navigationTitle("Risparmio")
                 .background(Color.purple.opacity(0.05).edgesIgnoringSafeArea(.all)) // Sfondo dinamico
@@ -66,39 +71,13 @@ struct Risparmio: View {
         }
     }
     
-    // Imposta un nuovo obiettivo
-    func setGoal() {
-        if let amount = Double(newGoalAmount), amount > 0 {
-            goalAmount = amount
-            currentSavings = 0
-            newGoalAmount = ""
-        }
-    }
-    
-    // Aggiungi risparmio all'obiettivo corrente
-    func addSavings() {
-        if let amount = Double(savingAmount), amount > 0 {
-            currentSavings += amount // Aggiungi l'importo inserito al totale
-            savingAmount = "" // Resetta il campo di input
-        }
-    }
-    
-    // Resetta l'obiettivo una volta raggiunto
-    func resetGoal() {
-        // Aggiungi l'obiettivo completato alla cronologia
-        if let completedGoalAmount = goalAmount {
-            completedGoals.append((goalAmount: completedGoalAmount, currentSavings: currentSavings))
-        }
-        
-        // Resetta il goal e i risparmi
-        goalAmount = nil
-        currentSavings = 0
-    }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         Risparmio(showGif: false)
+            .environmentObject(RisparmioViewModel())
+        
     }
 }
 //MARK: CREA OBIETTIVO
@@ -111,6 +90,7 @@ struct CreateGoalView: View {
             Text("Crea la tua abitudine di Risparmio")
                 .font(.title)
                 .fontWeight(.bold)
+                .multilineTextAlignment(.center)
                 .padding()
             TextField("Inserisci somma obiettivo (€)", text: $newGoalAmount)
                 .keyboardType(.decimalPad)
@@ -131,7 +111,8 @@ struct CreateGoalView: View {
             .disabled(newGoalAmount.isEmpty || Double(newGoalAmount) == nil)
         }
         .padding()
-        .background(Color.purple.opacity(0.1))
+        .background(Color.white.opacity(0.5))
+        
         .cornerRadius(20)
         .shadow(radius: 10)
     }
@@ -144,7 +125,8 @@ struct CurrentGoalView: View {
     let addSavings: () -> Void
     @Binding var showGif: Bool
     let resetGoal: () -> Void
-
+    @State private var audioPlayer: AVAudioPlayer?
+    
     var body: some View {
         VStack {
             Text("Obiettivo Attuale")
@@ -187,6 +169,7 @@ struct CurrentGoalView: View {
                 Button(action: {
                     addSavings()
                     showGif = true
+                    playSound()
                 }) {
                     Text("Aggiungi")
                         .frame(width: 80, height: 50)
@@ -222,17 +205,58 @@ struct CurrentGoalView: View {
         .cornerRadius(20)
         .shadow(radius: 10)
     }
+   
+    private func playSound() {
+            guard let path = Bundle.main.path(forResource: "coins", ofType: "mp3") else {
+                print("File audio non trovato!")
+                return
+            }
+            let url = URL(fileURLWithPath: path)
+
+            do {
+                // Inizializza e riproduce l'audio
+                audioPlayer = try AVAudioPlayer(contentsOf: url)
+                audioPlayer?.play()
+            } catch {
+                print("Errore durante la riproduzione del suono: \(error.localizedDescription)")
+            }
+        }
 }
 
 //MARK: CRONOLOGIA
 struct HistoryView: View {
-    @Binding var completedGoals: [(goalAmount: Double, currentSavings: Double)]
+    @Binding var completedGoals: [CompletedGoal]
     
     
     var body: some View {
+        ZStack {
+            
+            ZStack{
+                
+                VStack{
+                    ForEach(0..<7){_ in
+                        HStack(spacing: 30){
+                            Text("💰").font(.system(size: 50))
+                            Text("💸").font(.system(size: 50))
+                            Text("💰").font(.system(size: 50))
+                            Text("💸").font(.system(size: 50))
+                            Text("💰").font(.system(size: 50))
+                            
+                        }.frame(maxWidth: .infinity, maxHeight: .infinity)
+                        HStack(spacing: 70){
+                            Text("💸").font(.system(size: 25))
+                            Text("💰").font(.system(size: 25))
+                            Text("💸").font(.system(size: 25))
+                            Text("💰").font(.system(size: 25))
+                        }.frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                }
+                Color.bluino.opacity(0.6)
+            }.ignoresSafeArea()
+            
         VStack {
-            Text("Cronologia Obiettivi Completati")
-                .font(.title)
+            Text("Cronologia Risparmi")
+                .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding()
             
@@ -253,18 +277,18 @@ struct HistoryView: View {
                         Spacer()
                     }
                     .padding(.vertical)
-                    .background(Color.white.opacity(0.8))
+                    
                     .cornerRadius(10)
                     .shadow(radius: 5)
                 }
                 .listStyle(PlainListStyle())
+                
+                .padding()
+                
             }
         }
-        .padding()
-        .background(Color.purple.opacity(0.1))
-        .cornerRadius(20)
-        .shadow(radius: 10)
-        .navigationTitle("Cronologia")
+        
+        }
     }
 }
 

@@ -11,13 +11,14 @@ struct Home: View {
     @EnvironmentObject var variables: AppVariables
     @Binding var showTabView: Bool
     @EnvironmentObject var viewModel: AbitudiniViewModel
-   
-    @State var habits:[String] = ["Attività Fisica","Salute Mentale","Alimentazione e Idratazione","Studio e Creatività", "Risparmiare"]
+    @EnvironmentObject var viewModel1: RisparmioViewModel
+    @State var habits:[String] = ["Risparmio", "Attività Fisica","Salute Mentale","Alimentazione e Idratazione","Studio e Creatività"]
     @State var newHabit: String = ""
     @State var isAddingNewHabit: Bool = false
     @State var page1: Bool = false
     var body: some View {
-       
+        
+            
             ScrollView{
                 
                 VStack(alignment: .leading, spacing: 10) {
@@ -100,17 +101,46 @@ struct Home: View {
                                 .stroke(Color.black, lineWidth:2)
                                 
                                 .overlay(
+                                    
                                     HStack{
                                         Spacer()
-                                        Text(habit)
-                                            .font(.system(size: 26))
-                                            .bold()
+                                        
+                                        VStack{
+                                            ZStack {
+                                                if habit == "Risparmio" {
+                                                    ZStack{ Image("new")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                        
+                                                        
+                                                    }.frame(width: 100)
+                                                        .offset(x:-90, y:-74 )
+                                                }
+                                                
+                                                Text(habit)
+                                                    .font(.system(size: 26))
+                                                    .bold()
+                                                
+                                                
+                                            }
+                                        }
+                                        
                                         Spacer()
                                         //SVGtoSwiftUIView(divisions:5, completation: 3)
-                                        let progress = viewModel.progressForCategory(habit, forDay: viewModel.giornoCorrente)
-                                        SVGtoSwiftUIView(divisions: progress.totale, completation: progress.completate)
-                                        
-                                        
+                                        if habit == "Risparmio" { VStack {
+                                            Text("€\(viewModel1.currentSavings, specifier: "%.2f") / €\(viewModel1.goalAmount ?? 0, specifier: "%.2f")")
+                                                .font(.headline)
+                                                .foregroundColor(.white)
+                                            ProgressView(value: viewModel1.goalAmount != nil ? viewModel1.currentSavings / viewModel1.goalAmount! : 0)
+                                                .progressViewStyle(LinearProgressViewStyle(tint: .green))
+                                                .frame(width: 100)
+                                        }.padding([.trailing])
+                                            
+                                        }else{
+                                            let progress = viewModel.progressForCategory(habit, forDay: viewModel.giornoCorrente)
+                                            SVGtoSwiftUIView(divisions: progress.totale, completation: progress.completate)
+                                            
+                                        }
                                     })
                                 .frame(maxWidth:.infinity)
                                 .frame(height:180)
@@ -120,24 +150,20 @@ struct Home: View {
                 }
                 
                 
-                /* per ogni macro categoria creare una pagina (che deve essere uguale per tutti)
-                 con calendario, grafici, to-do list ()
-                 nel caso di classifiche aggiungere nella tab view un icona
-                 */
                 
                 
                 
                 
             }
             
-           
+            
         
     }
     
     @ViewBuilder
     func destinationView(for habit: String) -> some View {
         switch habit {
-        case "Risparmiare":
+        case "Risparmio":
             Risparmio()
         default:
             HabitView(macroAbitudine: habit)// Passa il nome della macroabitudine
@@ -155,6 +181,7 @@ struct Home: View {
     Goals(selected:0)
         .environmentObject(AppVariables())
      .environmentObject(AbitudiniViewModel())
+     .environmentObject(RisparmioViewModel())
     /*Home(
             selected: .constant(0), // Tab selezionato di default
             showTabView: .constant(true) // TabView visibile di default
@@ -199,3 +226,27 @@ struct SVGtoSwiftUIView: View {
     }
 
 
+/*struct ProgressCircle: View {
+    var progress: Double
+ 
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(lineWidth: 10)
+                .opacity(0.3)
+                .foregroundColor(.gray)
+ 
+            Circle()
+                .trim(from: 0.0, to: CGFloat(min(progress, 1.0)))
+                .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
+                .foregroundColor(progress >= 1.0 ? .green : .blue)
+                .rotationEffect(Angle(degrees: 270))
+                .animation(.easeInOut, value: progress)
+ 
+            Text("\(Int(progress * 100))%")
+                .font(.headline)
+                .bold()
+        }
+    }
+}
+*/

@@ -67,6 +67,9 @@ struct ContentView: View {
                             .padding(.top,800)
                             .fullScreenCover(isPresented:$isTrue,content:{
                                 Nickname()
+                                    .onDisappear{
+                                        UserDefaultsManager.shared.setFirstLaunchDone()
+                                }
                             })
                     }
                 }
@@ -81,5 +84,7 @@ struct ContentView: View {
 
 
 #Preview {
-    ContentView().environmentObject(AbitudiniViewModel())
+    ContentView()
+        .environmentObject(AbitudiniViewModel())
+        .environmentObject(RisparmioViewModel())
 }

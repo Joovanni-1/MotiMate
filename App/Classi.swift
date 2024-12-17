@@ -6,17 +6,107 @@
 //
 
 import Foundation
-import CoreData
 
 
-class AppVariables: ObservableObject{
-    @Published var globalName: String = ""
-    @Published var cognome: String = ""
-    @Published var age: Int = 15
-    @Published var sex: String = ""
-    @Published var nickname: String = ""
+
+class AppVariables: ObservableObject {
+    @Published var globalName: String = "" {
+        didSet { saveToUserDefaults() }
+    }
+    @Published var cognome: String = "" {
+        didSet { saveToUserDefaults() }
+    }
+    @Published var age: Int = 15 {
+        didSet { saveToUserDefaults() }
+    }
+    @Published var sex: String = "" {
+        didSet { saveToUserDefaults() }
+    }
+    @Published var nickname: String = "" {
+        didSet { saveToUserDefaults() }
+    }
     
+    init() {
+        if let savedUserData = UserDefaults.standard.dictionary(forKey: "currentUser") {
+            self.nickname = savedUserData["nickname"] as? String ?? ""
+            self.globalName = savedUserData["globalName"] as? String ?? ""
+            self.cognome = savedUserData["cognome"] as? String ?? ""
+            self.sex = savedUserData["sex"] as? String ?? ""
+            self.age = savedUserData["age"] as? Int ?? 15
+        }
+    }
+    
+    func toDictionary() -> [String: Any] {
+        return [
+            "nickname": nickname,
+            "globalName": globalName,
+            "cognome": cognome,
+            "sex": sex,
+            "age": age
+        ]
+    }
+    
+    private func saveToUserDefaults() {
+        let userDictionary = toDictionary()
+        UserDefaults.standard.set(userDictionary, forKey: "currentUser")
+    }
+
+
+     
+        // Funzione statica per creare un'istanza AppVariables da un dizionario
+        static func fromDictionary(_ dictionary: [String: Any]) -> AppVariables {
+            let user = AppVariables()
+            user.nickname = dictionary["nickname"] as? String ?? ""
+            user.globalName = dictionary["globalName"] as? String ?? ""
+            user.cognome = dictionary["cognome"] as? String ?? ""
+            user.sex = dictionary["sex"] as? String ?? ""
+            user.age = dictionary["age"] as? Int ?? 0
+            return user
+        }
 }
+
+
+class UserDefaultsManager {
+    static let shared = UserDefaultsManager()
+    private let userKey = "savedUsers"
+    private let firstLaunchKey = "isFirstLaunch"
+    
+    private init() {}
+    
+    // Recupera tutti gli utenti salvati
+    func getAllUsers() -> [AppVariables] {
+        guard let savedData = UserDefaults.standard.array(forKey: userKey) as? [[String: Any]] else {
+            return []
+        }
+        return savedData.map { AppVariables.fromDictionary($0) }
+    }
+    
+    // Salva un nuovo utente
+    func saveUser(_ user: AppVariables) -> Bool {
+        var users = getAllUsers()
+        
+        // Verifica l'unicità del nickname
+        if users.contains(where: { $0.nickname == user.nickname }) {
+            return false // Nickname già esistente
+        }
+        
+        users.append(user)
+        
+        // Converti gli utenti in dizionari e salva nei UserDefaults
+        let userDictionaries = users.map { $0.toDictionary() }
+        UserDefaults.standard.set(userDictionaries, forKey: userKey)
+        return true
+    }
+    // MARK: - Is First Launch
+        func isFirstLaunch() -> Bool {
+            return UserDefaults.standard.bool(forKey: firstLaunchKey) == false
+        }
+     
+        func setFirstLaunchDone() {
+            UserDefaults.standard.set(true, forKey: firstLaunchKey)
+        }
+}
+
 
 
 // codice user default
@@ -221,6 +311,68 @@ class AbitudiniViewModel: ObservableObject {
             abitudini[index].completamentiDate.removeAll()
         }
         salvaDati()
+    }
+}
+
+
+ 
+class RisparmioViewModel: ObservableObject {
+    // Variabili persistenti
+    @Published var goalAmount: Double? = UserDefaults.standard.object(forKey: "goalAmount") as? Double
+    @Published var currentSavings: Double = UserDefaults.standard.double(forKey: "currentSavings")
+    @Published var completedGoals: [CompletedGoal] = {
+        if let data = UserDefaults.standard.data(forKey: "completedGoals"),
+           let decoded = try? JSONDecoder().decode([CompletedGoal].self, from: data) {
+            return decoded
+        }
+        return []
+    }()
+    // Variabili temporanee
+    @Published var newGoalAmount: String = ""
+    @Published var savingAmount: String = ""
+    @Published var showGif: Bool = false
+    @Published var isNavigatingToHistory: Bool = false
+ 
+    // Funzione per salvare lo stato
+    func saveState() {
+        if let goal = goalAmount {
+            UserDefaults.standard.set(goal, forKey: "goalAmount")
+        } else {
+            UserDefaults.standard.removeObject(forKey: "goalAmount")
+        }
+        UserDefaults.standard.set(currentSavings, forKey: "currentSavings")
+        if let encoded = try? JSONEncoder().encode(completedGoals) {
+            UserDefaults.standard.set(encoded, forKey: "completedGoals")
+        }
+    }
+ 
+    // Imposta un nuovo obiettivo
+    func setGoal() {
+        if let amount = Double(newGoalAmount), amount > 0 {
+            goalAmount = amount
+            currentSavings = 0
+            newGoalAmount = ""
+            saveState()
+        }
+    }
+ 
+    // Aggiungi risparmio all'obiettivo corrente
+    func addSavings() {
+        if let amount = Double(savingAmount), amount > 0 {
+            currentSavings += amount
+            savingAmount = ""
+            saveState()
+        }
+    }
+ 
+    // Resetta l'obiettivo una volta raggiunto
+    func resetGoal() {
+        if let completedGoalAmount = goalAmount {
+            completedGoals.append(CompletedGoal(goalAmount: completedGoalAmount, currentSavings: currentSavings))
+        }
+        goalAmount = nil
+        currentSavings = 0
+        saveState()
     }
 }
 

@@ -54,7 +54,7 @@ struct Goals: View {
                                 Image(systemName: "gear")
                             }
                         }.tag(3)
-                }
+                }.accentColor(Color.black)
             } else {
                     EmptyView() // Nasconde la TabView
                 }
@@ -68,4 +68,5 @@ struct Goals: View {
 #Preview {
     Goals().environmentObject(AppVariables())
         .environmentObject(AbitudiniViewModel())
+        .environmentObject(RisparmioViewModel())
 }
