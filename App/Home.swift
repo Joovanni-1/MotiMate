@@ -12,7 +12,8 @@ struct Home: View {
     @Binding var showTabView: Bool
     @EnvironmentObject var viewModel: AbitudiniViewModel
     @EnvironmentObject var viewModel1: RisparmioViewModel
-    @State var habits:[String] = ["Risparmio", "Attività Fisica","Salute Mentale","Alimentazione e Idratazione","Studio e Creatività"]
+    @EnvironmentObject var habitsManager: HabitsManager
+    //@State var habits:[String] = ["Risparmio", "Attività Fisica","Salute Mentale","Alimentazione e Idratazione","Studio e Creatività"]
     @State var newHabit: String = ""
     @State var isAddingNewHabit: Bool = false
     @State var page1: Bool = false
@@ -56,7 +57,7 @@ struct Home: View {
                     Button(action: {
                         // Aggiungi la nuova abitudine in coda alla lista
                         if !newHabit.isEmpty {
-                            habits.append(newHabit)
+                            habitsManager.addHabit(newHabit)
                             newHabit = "" // Reset del campo di testo
                             isAddingNewHabit = false // Nascondi il campo di inserimento
                         }
@@ -85,7 +86,7 @@ struct Home: View {
                 
                 
                 
-                ForEach (habits, id:\.self){ habit in
+                ForEach (habitsManager.habits, id:\.self){ habit in
                     
                     NavigationLink(destination: destinationView(for: habit)
                         .onAppear {
@@ -182,6 +183,7 @@ struct Home: View {
         .environmentObject(AppVariables())
      .environmentObject(AbitudiniViewModel())
      .environmentObject(RisparmioViewModel())
+     .environmentObject(HabitsManager())
     /*Home(
             selected: .constant(0), // Tab selezionato di default
             showTabView: .constant(true) // TabView visibile di default
@@ -226,27 +228,4 @@ struct SVGtoSwiftUIView: View {
     }
 
 
-/*struct ProgressCircle: View {
-    var progress: Double
- 
-    var body: some View {
-        ZStack {
-            Circle()
-                .stroke(lineWidth: 10)
-                .opacity(0.3)
-                .foregroundColor(.gray)
- 
-            Circle()
-                .trim(from: 0.0, to: CGFloat(min(progress, 1.0)))
-                .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
-                .foregroundColor(progress >= 1.0 ? .green : .blue)
-                .rotationEffect(Angle(degrees: 270))
-                .animation(.easeInOut, value: progress)
- 
-            Text("\(Int(progress * 100))%")
-                .font(.headline)
-                .bold()
-        }
-    }
-}
-*/
+

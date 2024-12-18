@@ -187,6 +187,7 @@ struct Streak: View {
         .environmentObject(AppVariables())
      .environmentObject(AbitudiniViewModel())
      .environmentObject(RisparmioViewModel())
+     .environmentObject(HabitsManager())
 }
 
 

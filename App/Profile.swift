@@ -151,6 +151,7 @@ struct ProfileImagePickerView: View {
     Goals(selected:2)
         .environmentObject(AppVariables())
      .environmentObject(AbitudiniViewModel())
+     .environmentObject(HabitsManager())
    
    // Profile()
       //  .environmentObject(AppVariables())

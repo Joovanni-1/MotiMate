@@ -63,6 +63,8 @@ struct HabitView: View {
     let calendar = Calendar.current
     @State var newhabit: Bool = false
     @State private var abitudineDaModificare: Abitudine?
+    @State private var mostraConfettiView = false
+    @State private var mostraFraseView = false
     
     var body: some View {
         NavigationView {
@@ -86,6 +88,45 @@ struct HabitView: View {
                     .padding()
                 }
                 .scrollIndicators(.hidden)
+                
+                
+                if mostraConfettiView {
+                               ConfettiView()
+                                   .transition(.opacity)
+                                   .onAppear {
+                                       mostraFraseView = false
+                                       DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                           mostraConfettiView = false
+                                           
+                                       }
+                                   }
+                           }
+                
+                if mostraFraseView && !mostraConfettiView {
+                    RandomPhraseView()
+                        .transition(.opacity)
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                mostraFraseView = false
+                            }
+                        }
+                }
+            }
+            .onReceive(viewModel.$mostraConfetti) { value in
+                           mostraConfettiView = value
+                           if value {
+                               DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                   viewModel.mostraConfetti = false
+                               }
+                           }
+            }
+            .onReceive(viewModel.$mostraFraseRandom){ value in
+                mostraFraseView = value
+                if value {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        viewModel.mostraFraseRandom = false
+                    }
+                }
             }
         }
         .environmentObject(viewModel)
@@ -203,6 +244,7 @@ struct HabitView: View {
             Spacer()
             menuAbitudine(abitudine: abitudine)
         }
+        
         .padding()
         .background(
             abitudine.completamentiDate[viewModel.giornoSelezionato ?? Date()] == true
@@ -384,11 +426,11 @@ func filtraAbitudiniPerGiornoSelezionato(_giornoSelezionato: Date?) -> [Abitudin
 #Preview {
     HabitView(macroAbitudine: "Attività Fisica").environmentObject(AbitudiniViewModel())
        
-    // Passa un valore di esempio per macroAbitudine
+   
              
     }
  
- // provare a mettere al posto del vettore giorni settimana la funzione dayOfWeek 
+ 
           
 struct DailyHabitCompletion: Identifiable {
     let id = UUID()

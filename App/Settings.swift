@@ -11,6 +11,7 @@ import UserNotifications
 import SDWebImageSwiftUI
 
 struct Settings: View {
+    @EnvironmentObject var variables: AppVariables
     @State private var isDarkMode: Bool = UserDefaults.standard.bool(forKey: "isDarkMode")
     @State private var showAboutUs: Bool = false
     @State private var showReminderScreen: Bool = false
@@ -41,22 +42,24 @@ struct Settings: View {
                         showGIF = true
                         hasClicked = true
                         saveHasClicked()
-                        fullMessage = "Guarda il castoro in azione!" // Messaggio iniziale
+                        fullMessage = "\(variables.globalName), sei pronto a fare un altro passo verso il tuo obiettivo?" // Messaggio iniziale
                         typeMessage()
                         
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 7.0) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 17.0) {
                             showReminderScreen = true
                         }
 
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                            showGIF = false
-                            fullMessage = "Spero ti sia piaciuto il castoro!"
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 7.0) {
+                            showGIF = true
+                            fullMessage = "Ogni notifica è li per ricordarti la promessa che hai fatto a te stesso. Non fermarti ora!!"
                             typeMessage()
                             saveMessage()
                         }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0) {showGIF = true}
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 20) {showGIF = false}
                     } else {
                         // Nei click successivi, mostra direttamente il foglio modale
-                        fullMessage = "Spero ti sia piaciuto il castoro!"
+                        fullMessage = "Ogni notifica è li per ricordarti la promessa che hai fatto a te stesso. Non fermarti ora!!"
                         
                         showReminderScreen = true
                     }
@@ -92,7 +95,7 @@ struct Settings: View {
                 .background(Color(UIColor.secondarySystemBackground))
                 .cornerRadius(10)
 
-               /* Button(action: {
+               Button(action: {
                     resetHasClicked()
                 }) {
                     Text("Reset HasClicked")
@@ -101,7 +104,7 @@ struct Settings: View {
                         .background(Color.red)
                         .foregroundColor(.white)
                         .cornerRadius(10)
-                }*/
+                }
                 Castoro
                 // Share App Bottone
                 Button(action: {
@@ -158,6 +161,7 @@ struct Settings: View {
                         AnimatedImage(name: "castoro.gif")
                             .resizable()
                             .scaledToFit()
+                            
                     }
                     if !displayedMessage.isEmpty {
                         ZStack {
@@ -167,8 +171,10 @@ struct Settings: View {
                             Text(displayedMessage) // Testo sopra la nuvoletta
                                 .font(.headline)
                                 .multilineTextAlignment(.leading)
-                                .padding()
-                                .frame(width: 150, height: 200)// Dimensione del testo
+                                .padding(.leading,30)
+                                .frame(width: 150, height: 200)
+                                
+                                // Dimensione del testo
                         }
                         .offset(x: 170, y: 10) // Posiziona la nuvoletta sopra il castoro
                     }
@@ -346,4 +352,6 @@ struct Reminder: Identifiable, Codable {
     Goals(selected:3)
         .environmentObject(AppVariables())
      .environmentObject(AbitudiniViewModel())
+     .environmentObject(RisparmioViewModel())
+     .environmentObject(HabitsManager())
 }

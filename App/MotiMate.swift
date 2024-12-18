@@ -8,13 +8,14 @@
 import SwiftUI
 
 @main
-struct AppApp: App {
+struct MotiMate: App {
         @StateObject private var abitudiniViewModel = AbitudiniViewModel()
     @StateObject private var risparmioViewModel = RisparmioViewModel()
         // Flag per verificare se è la prima apertura
         @AppStorage("isFirstLaunch") private var isFirstLaunch: Bool = true
         var body: some Scene {
             WindowGroup {
+                
                 
                 if UserDefaultsManager.shared.isFirstLaunch() {
                     // Mostra ContentView solo la prima volta

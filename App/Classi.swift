@@ -124,6 +124,8 @@ class AbitudiniViewModel: ObservableObject {
     @Published var giornoCorrente: Date = Date()
     @Published var streakGiorni: [Date] = []
     @Published var maxStreak: Int = 0 // Aggiungi questa variabile per il massimo streak
+    @Published var mostraConfetti: Bool = false
+    @Published var mostraFraseRandom: Bool = false
     
     init() {
         caricaDati()
@@ -218,7 +220,9 @@ class AbitudiniViewModel: ObservableObject {
                 print("Abitudine \(abitudini[index].nome) per il giorno \(giorno) completata per la prima volta.")
             }
             
-            
+            if abitudini[index].completamentiDate[giorno] == true {
+                        mostraFraseRandom = true
+                    }
             salvaDati()
             
             aggiornaStreak()
@@ -269,12 +273,16 @@ class AbitudiniViewModel: ObservableObject {
             if !streakGiorni.contains(where: { Calendar.current.isDate($0, inSameDayAs: giornoCorrente) }) {
                 streakGiorni.append(giornoCorrente)
             }
-        } else {
-            // Rimuovi il giorno corrente dallo streak se non è completo
-            streakGiorni.removeAll(where: { Calendar.current.isDate($0, inSameDayAs: giornoCorrente) })
-        }
+            
+            if calcolaStreakConsecutivo() > 0 {
+                        mostraConfetti = true
+                    }
+                } else {
+                    streakGiorni.removeAll(where: { Calendar.current.isDate($0, inSameDayAs: giornoCorrente) })
+                }
         
         salvaDati()
+        
     }
     
     func calcolaStreakConsecutivo() -> Int {
@@ -333,6 +341,9 @@ class RisparmioViewModel: ObservableObject {
     @Published var showGif: Bool = false
     @Published var isNavigatingToHistory: Bool = false
  
+    
+   
+    
     // Funzione per salvare lo stato
     func saveState() {
         if let goal = goalAmount {
@@ -376,3 +387,23 @@ class RisparmioViewModel: ObservableObject {
     }
 }
 
+class HabitsManager: ObservableObject {
+    static let shared = HabitsManager() // Singleton per l'uso in tutta l'app
+    @Published var habits: [String] {
+        didSet {
+            UserDefaults.standard.set(habits, forKey: "userHabits")
+        }
+    }
+    init() {
+        // Carica le abitudini salvate, altrimenti usa quelle di default
+        self.habits = UserDefaults.standard.array(forKey: "userHabits") as? [String] ?? ["Risparmio", "Attività Fisica", "Salute Mentale", "Alimentazione e Idratazione", "Studio e Creatività"]
+    }
+    func addHabit(_ habit: String) {
+        if !habit.isEmpty && !habits.contains(habit) {
+            habits.append(habit)
+        }
+    }
+    func removeHabit(_ habit: String) {
+        habits.removeAll { $0 == habit }
+    }
+}
