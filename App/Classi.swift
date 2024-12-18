@@ -46,7 +46,7 @@ class AppVariables: ObservableObject {
         ]
     }
     
-    private func saveToUserDefaults() {
+     func saveToUserDefaults() {
         let userDictionary = toDictionary()
         UserDefaults.standard.set(userDictionary, forKey: "currentUser")
     }

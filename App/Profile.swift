@@ -70,7 +70,7 @@ struct Profile: View {
                     capsuletta.overlay(Text(variables.cognome))
                     capsuletta.overlay(Text(variables.sex))
                     capsuletta.overlay(Text("\(variables.age)"))
-                }
+                }.foregroundColor(.black)
             }
             .sheet(isPresented: $isPickerPresented) {
                 ProfileImagePickerView { selectedImageName in
@@ -152,6 +152,7 @@ struct ProfileImagePickerView: View {
         .environmentObject(AppVariables())
      .environmentObject(AbitudiniViewModel())
      .environmentObject(HabitsManager())
+     .environmentObject(RisparmioViewModel())
    
    // Profile()
       //  .environmentObject(AppVariables())

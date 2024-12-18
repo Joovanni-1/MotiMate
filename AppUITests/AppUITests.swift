@@ -7,7 +7,112 @@
 
 import XCTest
 
-final class AppUITests: XCTestCase {
+@testable import MotiMate
+ 
+final class MotiMateTests: XCTestCase {
+ 
+    var abitudiniViewModel: AbitudiniViewModel!
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        // Initialize the ViewModel before each test
+        abitudiniViewModel = AbitudiniViewModel()
+        abitudiniViewModel.resetHabitsDone() // Ensure a clean state
+    }
+ 
+    override func tearDownWithError() throws {
+        abitudiniViewModel = nil // Cleanup
+        try super.tearDownWithError()
+    }
+ 
+    func testAddHabit() throws {
+        // Add a habit
+        let daysOfWeek = [true, false, true, false, true, false, false] // MWF
+        abitudiniViewModel.aggiungiAbitudine(
+            nome: "Test Habit",
+            orario: "08:00",
+            giorno: Date(),
+            giorniSelezionati: daysOfWeek,
+            macroAbitudine: "Salute Mentale"
+        )
+        XCTAssertEqual(abitudiniViewModel.abitudini.count, 1)
+        XCTAssertEqual(abitudiniViewModel.abitudini.first?.nome, "Test Habit")
+    }
+ 
+    func testCompleteHabit() throws {
+        // Add and complete a habit
+        let habitId = UUID()
+        abitudiniViewModel.abitudini = [
+            Abitudine(
+                id: habitId,
+                nome: "Sample Habit",
+                orario: "08:00",
+                giorno: Date(),
+                completata: false,
+                daysOfWeek: [true, true, true, true, true, false, false],
+                completamentiGiorni: [false, false, false],
+                macroAbitudine: "Salute Mentale"
+            )
+        ]
+ 
+        let selectedDay = Date()
+        abitudiniViewModel.spuntaAbitudine(id: habitId, perGiorno: selectedDay)
+        let completedStatus = abitudiniViewModel.abitudini.first?.completamentiDate[selectedDay]
+ 
+        XCTAssertEqual(completedStatus, true)
+    }
+ 
+    func testCalculateStreak() throws {
+        // Add multiple days of completion and validate streak calculation
+        let habitId = UUID()
+        let today = Date()
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: today)!
+ 
+        abitudiniViewModel.abitudini = [
+            Abitudine(
+                id: habitId,
+                nome: "Sample Habit",
+                orario: "08:00",
+                giorno: Date(),
+                completata: false,
+                daysOfWeek: [true, true, true, true, true, false, false],
+                completamentiGiorni: [],
+                macroAbitudine: "Salute Mentale"
+            )
+        ]
+        abitudiniViewModel.spuntaAbitudine(id: habitId, perGiorno: yesterday)
+        abitudiniViewModel.spuntaAbitudine(id: habitId, perGiorno: today)
+        let streak = abitudiniViewModel.calcolaStreakConsecutivo()
+        XCTAssertEqual(streak, 2)
+    }
+}
+
+
+final class MotiMateUITests: XCTestCase {
+ 
+    func testAddHabitUI() throws {
+        let app = XCUIApplication()
+        app.launch()
+ 
+        // Navigate to habit creation
+        app.buttons["Create Habit"].tap()
+ 
+        // Enter habit details
+        let habitNameField = app.textFields["Nome abitudine"]
+        habitNameField.tap()
+        habitNameField.typeText("Morning Yoga")
+ 
+        app.switches["Reminder"].tap()
+        app.buttons["Save"].tap()
+ 
+        // Verify the habit appears in the list
+        XCTAssertTrue(app.staticTexts["Morning Yoga"].exists)
+    }
+}
+
+
+
+
+/*final class AppUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -40,4 +145,4 @@ final class AppUITests: XCTestCase {
             }
         }
     }
-}
+}*/

@@ -71,7 +71,7 @@ struct Settings: View {
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(.thickMaterial)
-                    .foregroundColor(.black)
+                    .background(Color(UIColor.secondarySystemBackground))
                     .cornerRadius(10)
                 }
                 .sheet(isPresented: $showReminderScreen) {
@@ -138,7 +138,7 @@ struct Settings: View {
                 .alert(isPresented: $showAboutUs) {
                     Alert(
                         title: Text("Chi siamo❓"),
-                        message: Text("Siamo un team di studenti di ingegneria Informatica che ha come obiettivo quello di motivare gli utenti a sviluppare sane abitudini per condurre una vita più.... "),
+                        message: Text("Siamo Alessia, Giovanni e Rebecca, un team di studenti di Ingegneria Informatica del Politecnico di Bari, che ha ideato quest'app per motivare gli utenti a sviluppare abitudini per condurre una vita più sana e meno statica📚 "),
                         dismissButton: .default(Text("Close"))
                     )
                 }
@@ -173,6 +173,7 @@ struct Settings: View {
                                 .multilineTextAlignment(.leading)
                                 .padding(.leading,30)
                                 .frame(width: 150, height: 200)
+                                .foregroundColor(.black)
                                 
                                 // Dimensione del testo
                         }

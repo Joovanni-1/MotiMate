@@ -171,12 +171,13 @@ struct HabitView: View {
                 }) {
                     Image(systemName: "chevron.left.circle.fill")
                         .font(.largeTitle)
-                        .foregroundColor(.blue)
+                        .foregroundColor(.ocean)
                 }
                 LazyHGrid(rows: [GridItem(.flexible())], spacing: 10) {
                     ForEach(0..<7) { index in
                         let giorno = getStartOfWeek(for: dataCorrente).addingTimeInterval(Double(index * 86400))
                         giornoCalendario(giorno: giorno)
+                            
                     }
                 }
                 Button(action: {
@@ -184,7 +185,7 @@ struct HabitView: View {
                 }) {
                     Image(systemName: "chevron.right.circle.fill")
                         .font(.largeTitle)
-                        .foregroundColor(.blue)
+                        .foregroundColor(.ocean)
                 }
             }
         }
@@ -193,10 +194,11 @@ struct HabitView: View {
         VStack {
             Text(dayOfWeek(for: giorno))
                 .font(.headline)
-                .foregroundColor(.blue)
+                .foregroundColor(.black)
             Text(dayNumber(for: giorno))
                 .font(.subheadline)
-                .foregroundColor(.gray)
+                .foregroundColor(.black)
+               
         }
         .background(
             calendar.isDate(giorno, inSameDayAs: viewModel.giornoSelezionato ?? Date())
@@ -241,6 +243,7 @@ struct HabitView: View {
                 Text("Giorni selezionati: \(giorniNomi)")
                     .font(.subheadline)
             }
+            .foregroundColor(Color.black)
             Spacer()
             menuAbitudine(abitudine: abitudine)
         }
@@ -297,8 +300,10 @@ struct HabitView: View {
                     )
                     .foregroundStyle(.blue)
                 }
+                
                 .chartYAxis{
                     AxisMarks(position: .leading)
+                        
                 }
                 .chartYScale(domain: 0...100)
                 .frame(height: 300)

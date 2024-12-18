@@ -119,7 +119,11 @@ struct Streak: View {
                                     .font(.largeTitle)
                                     .bold()
                                 
-                                Text("Habits Done")
+                                Text("Abitudini ")
+                                    .font(.headline)
+                                    .foregroundColor(.gray)
+                                Text("completate")
+                                    
                                     .font(.headline)
                                     .foregroundColor(.gray)
                             }
@@ -146,7 +150,7 @@ struct Streak: View {
                                 
                                 Text("Massimo Streak: \(viewModel.maxStreak) ")
                                     .font(.headline)
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(.gray)
                                     .padding(10)
                                 
                             }
