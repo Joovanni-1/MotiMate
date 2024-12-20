@@ -240,7 +240,6 @@ class AbitudiniViewModel: ObservableObject {
             
             abitudini[index].dataFineValidita = giorno - 1
             salvaDati()
-            
         }
     }
     
