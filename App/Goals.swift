@@ -8,14 +8,12 @@
 import SwiftUI
 
 struct Goals: View {
-    /*
-     creare un array con tutte le abitudini principali
-     bottone riferito ad ogni singolo array(foreach)
-     funzione che richiama la possibilità di aggiungere nell'array  un'altra abitudine
-     */
-    // ricordati che Risparmiare avrà un altra schermata
     
-    @State var selected: Int = 0
+    @State var selected: Int = 0 {
+        didSet {
+            print("Tab selezionato: \(selected)")
+        }
+    }
     @State private var showTabView = true
     var body: some View {
         
@@ -25,19 +23,13 @@ struct Goals: View {
                     Home(showTabView: $showTabView)
                         .tabItem{
                             VStack{
-                                
                                 Image(systemName: "house")
-                                
-                                
                             }
                         }.tag(0)
                     Streak()
                         .tabItem{
                             VStack{
-                                
                                 Image(systemName: "flame.fill")
-                                
-                                
                             }
                         }.tag(1)
                     Profile()
@@ -55,18 +47,19 @@ struct Goals: View {
                             }
                         }.tag(3)
                 }.accentColor(Color.black)
+                    .onAppear{
+                        print("Goals View onAppear")
+                    }
             } else {
                     EmptyView() // Nasconde la TabView
                 }
-                
-            
         }
     }
     
 }
-
 #Preview {
     Goals().environmentObject(AppVariables())
         .environmentObject(AbitudiniViewModel())
         .environmentObject(RisparmioViewModel())
+        .environmentObject(HabitsManager())
 }

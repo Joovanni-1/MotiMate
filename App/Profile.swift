@@ -7,18 +7,14 @@
 
 import SwiftUI
 
-
-
-
 struct Profile: View {
     @EnvironmentObject var variables: AppVariables
     var sfondoP: Color = Color(.white)
     @State private var photoImage: Image = Image(systemName: "person") // Immagine di default
     @State private var isPickerPresented: Bool = false // Stato per il picker
- 
     // Chiave per UserDefaults
     private let profileImageKey = "profileImageKey"
- 
+    
     var body: some View {
         ZStack {
             LinearGradient(colors: [.moss, Color("bluino")], startPoint: .top, endPoint: .bottom)
@@ -30,7 +26,6 @@ struct Profile: View {
                     .foregroundColor(sfondoP)
                     .cornerRadius(30)
                     .padding()
- 
                 Circle()
                     .stroke(sfondoP, lineWidth: 10)
                     .background(Color.white)
@@ -46,7 +41,6 @@ struct Profile: View {
                             .clipShape(Circle())
                             .offset(y: -250)
                     )
- 
                 ZStack {
                     Button(action: {
                         isPickerPresented = true // Mostra il photo picker
@@ -64,7 +58,6 @@ struct Profile: View {
                             .cornerRadius(150)
                     })
                 }.offset(x: 48, y: -200)
- 
                 VStack(spacing: 30) {
                     capsuletta.overlay(Text(variables.globalName))
                     capsuletta.overlay(Text(variables.cognome))
@@ -154,8 +147,5 @@ struct ProfileImagePickerView: View {
      .environmentObject(HabitsManager())
      .environmentObject(RisparmioViewModel())
    
-   // Profile()
-      //  .environmentObject(AppVariables())
-    // .environmentObject(AbitudiniViewModel())
 }
 

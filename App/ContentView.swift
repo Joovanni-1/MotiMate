@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State var isTrue :Bool = false
+    @State var isTrue :Bool = false {
+        didSet {
+            print("isTrue cambiato a: \(isTrue)")
+        }
+    }
     
     var body: some View {
         
@@ -21,9 +25,7 @@ struct ContentView: View {
                             .scaledToFill()
                             .frame(width: geometry.size.width, height: 1200)
                             .clipped()
-                    ZStack{
-                        
-                        
+                        ZStack{
                         Image("Moti Mate")
                             .resizable()
                             .scaledToFill()
@@ -33,9 +35,7 @@ struct ContentView: View {
                             Text("Ciao, benvenuto su MotiMate!")
                                 .frame(width:300,height:100)
                             
-                                .background(Color("marrone_scuro")
-                                            //.opacity(0.85)
-                                )
+                                .background(Color("marrone_scuro"))
                             
                                 .cornerRadius(5)
                                 .shadow(radius: 50)
@@ -51,6 +51,7 @@ struct ContentView: View {
                             .padding(.top,350)
                         
                         Button(action: {
+                            print("Pulsante INIZIA cliccato")
                             isTrue.toggle()
                         }, label: {Text("INIZIA")
                             
@@ -67,8 +68,12 @@ struct ContentView: View {
                             .padding(.top,800)
                             .fullScreenCover(isPresented:$isTrue,content:{
                                 Nickname()
+                                    .onAppear {
+                                    print("Schermata Nickname mostrata")
+                                                        }
                                     .onDisappear{
                                         UserDefaultsManager.shared.setFirstLaunchDone()
+                                        print("Schermata Nickname chiusa")
                                 }
                             })
                     }
@@ -80,11 +85,10 @@ struct ContentView: View {
     }
         
     }
-    
-
-
 #Preview {
     ContentView()
-        .environmentObject(AbitudiniViewModel())
-        .environmentObject(RisparmioViewModel())
+        .environmentObject(AppVariables())
+     .environmentObject(AbitudiniViewModel())
+     .environmentObject(RisparmioViewModel())
+     .environmentObject(HabitsManager())
 }

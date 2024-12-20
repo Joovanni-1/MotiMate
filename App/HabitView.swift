@@ -8,10 +8,6 @@
 
 import SwiftUI
 import Charts
-
-// problema: disconessione tra rettangolo bianco e grafico e giorno all'inizio dell'apertura della schermata
-// il grafico funziona però fa una media in base a quante abitudini hai inserito totali
-
 // Modello per una singola abitudine
 struct Abitudine: Identifiable, Codable  {
     var id = UUID()
@@ -27,7 +23,7 @@ struct Abitudine: Identifiable, Codable  {
     var giorniEsclusi: [Date] = []
     var giorniCompletati: [Date] = []
     
-    
+  //inizializzazione
     init(nome: String, orario: String, giorno: Date, completata: Bool, daysOfWeek: [Bool], completamentiGiorni: [Bool], macroAbitudine: String) {
             self.id = UUID()
             self.nome = nome
@@ -40,19 +36,15 @@ struct Abitudine: Identifiable, Codable  {
             self.completamentiDate = [:]
             self.dataFineValidita = nil
             self.macroAbitudine = macroAbitudine
-        
         }
 }
-
- 
-// ViewModel per gestire le abitudini
- 
 class Constants {
     static let giorniSettimana = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"]
 }
   
+
 struct HabitView: View {
-    
+    //MARK: VARIABILI
     var macroAbitudine: String
     @State private var dataCorrente = Date()
     @State private var nomeAbitudine = ""
@@ -66,6 +58,7 @@ struct HabitView: View {
     @State private var mostraConfettiView = false
     @State private var mostraFraseView = false
     
+    //MARK: STRUTTURA HABITVIEW
     var body: some View {
         NavigationView {
             ZStack {
@@ -88,8 +81,8 @@ struct HabitView: View {
                     .padding()
                 }
                 .scrollIndicators(.hidden)
-                
-                
+   
+//Mostra frasi motivazionali dopo aver spuntato un'abitudine
                 if mostraConfettiView {
                                ConfettiView()
                                    .transition(.opacity)
@@ -97,11 +90,9 @@ struct HabitView: View {
                                        mostraFraseView = false
                                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                                            mostraConfettiView = false
-                                           
                                        }
                                    }
                            }
-                
                 if mostraFraseView && !mostraConfettiView {
                     RandomPhraseView()
                         .transition(.opacity)
@@ -132,11 +123,12 @@ struct HabitView: View {
         .environmentObject(viewModel)
         .onAppear{
              viewModel.giornoSelezionato = Date()
+            print("HabitView onAppear: \(viewModel.abitudini)")
         }
         
     }
         
-    // MARK: Componenti Estratti
+    // MARK: Componenti habit view
     var pulsanteAggiungiAbitudine: some View {
         Button(action: {
             newhabit.toggle()
@@ -148,7 +140,6 @@ struct HabitView: View {
         }
     }
     var listaAbitudini: some View {
-        
         VStack {
                 let abitudiniMostrate = filtraAbitudiniPerGiornoSelezionato(_giornoSelezionato: viewModel.giornoSelezionato)
                // print("Caricamento lista abitudini: \(abitudiniMostrate.map { $0.nome })") // Aggiungi questo
@@ -175,7 +166,7 @@ struct HabitView: View {
                 }
                 LazyHGrid(rows: [GridItem(.flexible())], spacing: 10) {
                     ForEach(0..<7) { index in
-                        let giorno = getStartOfWeek(for: dataCorrente).addingTimeInterval(Double(index * 86400))
+                        let giorno = viewModel.getStartOfWeek(for: dataCorrente).addingTimeInterval(Double(index * 86400))
                         giornoCalendario(giorno: giorno)
                             
                     }
@@ -214,7 +205,7 @@ struct HabitView: View {
     }
     func cambiaSettimana(delta: Int) {
         dataCorrente = Calendar.current.date(byAdding: .weekOfYear, value: delta, to: dataCorrente)!
-        viewModel.giornoSelezionato = getStartOfWeek(for: dataCorrente)
+        viewModel.giornoSelezionato = viewModel.getStartOfWeek(for: dataCorrente)
     }
     
     func singolaAbitudine(abitudine: Abitudine) -> some View {
@@ -281,7 +272,7 @@ struct HabitView: View {
         }.accentColor(Color.black)
     }
  
- 
+ //MARK: GRAFICO SETTIMANALE
     var graficoPercentualeCompletamento: some View {
             VStack {
                 Text("Percentuale di Completamento Settimanale")
@@ -310,52 +301,35 @@ struct HabitView: View {
                 .padding()
             }
         }
-    
-       
-    // MARK: - FUNCTIONS
-    
-    
+   
     func calcolaPercentualeCompletamentoSettimanale() -> [DailyHabitCompletion] {
-        let startOfWeek = getStartOfWeek(for: dataCorrente)
-        // Genera i giorni della settimana
-        let giorniSettimana = (0..<7).map { startOfWeek.addingTimeInterval(Double($0 * 86400)) }
-     
-        let abitudiniFiltrate = viewModel.abitudini.filter{$0.macroAbitudine == macroAbitudine && $0.dataFineValidita.map{$0>=startOfWeek} ?? true}
-        return giorniSettimana.enumerated().map { index, giorno in
+        let startOfWeek = viewModel.getStartOfWeek(for: dataCorrente)
+    // Genera i giorni della settimana
+    let giorniSettimana = (0..<7).map{ startOfWeek.addingTimeInterval(Double($0 *
+    86400)) }
+    let abitudiniFiltrate = viewModel.abitudini.filter{$0.macroAbitudine == macroAbitudine && $0.dataFineValidita.map{$0>=startOfWeek} ?? true}
+    return giorniSettimana.enumerated().map{ index, giorno in
             // Filtra completamenti per il giorno
             let completamenti = abitudiniFiltrate.filter { abitudine in
-                        // Controlla se l'abitudine è attiva per quel giorno
+                // Controlla se l'abitudine è attiva per quel giorno
                 let weekdayIndex = (Calendar.current.component(.weekday, from: giorno) + 5) % 7
                 let isScheduledForDay = abitudine.daysOfWeek[weekdayIndex]
-                        let isDateValid = abitudine.dataFineValidita == nil || giorno <= abitudine.dataFineValidita!
-                        return isScheduledForDay && isDateValid && abitudine.completamentiDate[giorno] == true
-                    }
-                    // Calcola la percentuale in base alle abitudini attive in quella giornata
-                    let abitudiniGiornaliere = abitudiniFiltrate.filter { abitudine in
-                        let weekdayIndex = (Calendar.current.component(.weekday, from: giorno) + 5) % 7
-                        let isScheduledForDay = abitudine.daysOfWeek[weekdayIndex]
-                        let isDateValid = abitudine.dataFineValidita == nil || giorno <= abitudine.dataFineValidita!
-                        return isScheduledForDay && isDateValid
-                    }
+                let isDateValid = abitudine.dataFineValidita == nil || giorno <= abitudine.dataFineValidita!
+                return isScheduledForDay && isDateValid && abitudine.completamentiDate[giorno] == true
+            }
+            // Calcola la percentuale in base alle abitudini attive in quella giornata
+            let abitudiniGiornaliere = abitudiniFiltrate.filter { abitudine in
+                let weekdayIndex = (Calendar.current.component(.weekday, from: giorno) + 5) % 7
+                let isScheduledForDay = abitudine.daysOfWeek[weekdayIndex]
+                let isDateValid = abitudine.dataFineValidita == nil || giorno <= abitudine.dataFineValidita!
+                return isScheduledForDay && isDateValid
+            }
             // Calcola la percentuale
             let percentuale = abitudiniFiltrate.isEmpty ? 0 : (Double(completamenti.count) / Double(abitudiniFiltrate.count)) * 100
-            return DailyHabitCompletion(
-                day: Constants.giorniSettimana[index],
-                completion: percentuale
-            )
+            return DailyHabitCompletion(day: Constants.giorniSettimana[index], completion: percentuale)
         }
     }
-    
-    
-    
-    // Ottenere la data del lunedì della settimana corrente
-    func getStartOfWeek(for date: Date) -> Date {
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: date)
-        let firstWeekday = calendar.firstWeekday
-        let daysToSubtract = (weekday - firstWeekday + 7) % 7
-        return calendar.date(byAdding: .day, value: -daysToSubtract, to: date)!
-    }
+    // MARK: - FUNCTIONS
     
     // Formattazione della data (giorno e mese)
     func formattedDate(_ date: Date) -> String {
@@ -365,6 +339,7 @@ struct HabitView: View {
         return formatter.string(from: date)
             .uppercased()
     }
+    
     func formattedAnno(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy"
@@ -388,33 +363,27 @@ struct HabitView: View {
         return formatter.string(from: date)
     }
     func getWeekRange(for date: Date) -> (startOfWeek: Date, endOfWeek: Date) {
-        let startOfWeek = getStartOfWeek(for: date)
+        let startOfWeek = viewModel.getStartOfWeek(for: date)
         let endOfWeek = Calendar.current.date(byAdding: .day, value: 6, to: startOfWeek)!
         return (startOfWeek, endOfWeek)
     }
     
     
-    
+//MARK: FUNZIONE DI FILTRAGGIO PER GIORNO E MACROABITUDINE
 func filtraAbitudiniPerGiornoSelezionato(_giornoSelezionato: Date?) -> [Abitudine] {
-      
-    
         // Filtra per macro abitudine
         let macroFiltered = viewModel.abitudini.filter { $0.macroAbitudine == macroAbitudine }
     guard let giornoSelezionato = viewModel.giornoSelezionato else {
         print ("nessun giorno selezionato. Ritorno lista vuota")
         return []
     }
-        
         let filtrate = macroFiltered.filter { abitudine in
-           // let isScheduledForDay = abitudine.daysOfWeek[Calendar.current.component(.weekday, from: giornoSelezionato) - 1 ]
             let weekdayIndex = (Calendar.current.component(.weekday, from: giornoSelezionato) + 5) % 7
             let isScheduledForDay = abitudine.daysOfWeek[weekdayIndex]
+            let isStartDateValid = giornoSelezionato >= abitudine.giorno
             let isDateValid = abitudine.dataFineValidita == nil || giornoSelezionato <= abitudine.dataFineValidita!
-             
-           
-             
-            
-            return isDateValid && isScheduledForDay 
+ 
+            return isDateValid && isScheduledForDay && isStartDateValid
         }
     print("abitudini filtrate per giorno \(giornoSelezionato) : \(filtrate.map{$0.nome})")
     return filtrate
@@ -425,19 +394,13 @@ func filtraAbitudiniPerGiornoSelezionato(_giornoSelezionato: Date?) -> [Abitudin
                 viewModel.abitudini = viewModel.abitudini
             }
         }
-   
 }
  
 #Preview {
     HabitView(macroAbitudine: "Attività Fisica").environmentObject(AbitudiniViewModel())
-       
-   
-             
     }
- 
- 
-          
-struct DailyHabitCompletion: Identifiable {
+
+struct DailyHabitCompletion: Identifiable, Codable {
     let id = UUID()
     let day: String
     let completion: Double

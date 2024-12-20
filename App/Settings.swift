@@ -11,6 +11,7 @@ import UserNotifications
 import SDWebImageSwiftUI
 
 struct Settings: View {
+    //MARK: VARIABILI
     @EnvironmentObject var variables: AppVariables
     @State private var isDarkMode: Bool = UserDefaults.standard.bool(forKey: "isDarkMode")
     @State private var showAboutUs: Bool = false
@@ -77,10 +78,7 @@ struct Settings: View {
                 .sheet(isPresented: $showReminderScreen) {
                     ReminderView(reminders: $reminders)
                 }
-
-                
-
-                // Theme Toggle
+                // Tema Toggle
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Tema")
                         .font(.headline)
@@ -94,8 +92,8 @@ struct Settings: View {
                 .padding()
                 .background(Color(UIColor.secondarySystemBackground))
                 .cornerRadius(10)
-
-               Button(action: {
+//bottone per resettare l'azione del castoro data la possibilità di vederlo solo una volta in azione
+               /*Button(action: {
                     resetHasClicked()
                 }) {
                     Text("Reset HasClicked")
@@ -104,7 +102,7 @@ struct Settings: View {
                         .background(Color.red)
                         .foregroundColor(.white)
                         .cornerRadius(10)
-                }
+                }*/
                 Castoro
                 // Share App Bottone
                 Button(action: {
@@ -147,7 +145,6 @@ struct Settings: View {
             }
             .padding()
             .onAppear{loadMessage()}
-        
     }
 
     var Castoro : some View{
@@ -167,17 +164,16 @@ struct Settings: View {
                         ZStack {
                             Image("rb_115959") // Nuvoletta di fumetto caricata
                                 .resizable()
-                                .frame(width: 300, height: 200) // Dimensione della nuvoletta
-                            Text(displayedMessage) // Testo sopra la nuvoletta
+                                .frame(width: 300, height: 200)
+                            Text(displayedMessage)
                                 .font(.headline)
                                 .multilineTextAlignment(.leading)
                                 .padding(.leading,30)
                                 .frame(width: 150, height: 200)
                                 .foregroundColor(.black)
                                 
-                                // Dimensione del testo
                         }
-                        .offset(x: 170, y: 10) // Posiziona la nuvoletta sopra il castoro
+                        .offset(x: 170, y: 10)
                     }
                 }
                 .frame(width: 200, height: 200)
@@ -225,6 +221,7 @@ struct Settings: View {
 }
 
 struct ReminderView: View {
+    @EnvironmentObject var variables: AppVariables
     @Binding var reminders: [Reminder]
     @State private var notificationName: String = ""
     @State private var notificationTime: Date = Date()
@@ -242,8 +239,6 @@ struct ReminderView: View {
                 
             TextField("Titolo della notifica", text: $notificationName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                
-
             Button(action: {
                 showTimePicker.toggle()
             }) {
@@ -313,7 +308,7 @@ struct ReminderView: View {
     private func scheduleNotification(for reminder: Reminder) {
         let content = UNMutableNotificationContent()
         content.title = reminder.name
-        content.body = "It's time for your habit!"
+        content.body = "\(variables.globalName), è l'ora di completare la tua abitudine!"
         content.sound = .default
 
         let triggerDate = Calendar.current.dateComponents([.hour, .minute], from: reminder.time)

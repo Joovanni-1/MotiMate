@@ -13,11 +13,8 @@ struct CompletedGoal: Codable {
     let goalAmount: Double
     let currentSavings: Double
 }
-
 struct Risparmio: View {
     @EnvironmentObject var viewModel: RisparmioViewModel
-    
-    
     @State private var newGoalAmount: String = ""
     @State private var savingAmount: String = ""
     @State private var isNavigatingToHistory = false
@@ -26,8 +23,7 @@ struct Risparmio: View {
     init(showGif: Bool = false) { // Costruttore per la preview
         _showGif = State(initialValue: showGif)
     }
-    
-    
+    //MARK: STRUTTURA
     var body: some View {
         NavigationView {
             ZStack{
@@ -62,22 +58,18 @@ struct Risparmio: View {
                     }
                     .padding(.top)
                     .disabled(viewModel.completedGoals.isEmpty)
-                    
-                    
                 }
                 .navigationTitle("Risparmio")
                 .background(Color.purple.opacity(0.05).edgesIgnoringSafeArea(.all)) // Sfondo dinamico
             }
         }
     }
-    
 }
-
+//MODO ALTERNATIVO PER VEDERE LA PREVIEW SUL CANVA
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         Risparmio(showGif: false)
             .environmentObject(RisparmioViewModel())
-        
     }
 }
 //MARK: CREA OBIETTIVO
@@ -230,7 +222,7 @@ struct HistoryView: View {
     
     var body: some View {
         ZStack {
-            
+            //Background
             ZStack{
                 
                 VStack{
@@ -291,9 +283,6 @@ struct HistoryView: View {
         }
     }
 }
-
-
-
 struct Gif: View {
     
     @Binding  var showGif : Bool // Stato che determina se la GIF è visibile o meno

@@ -8,32 +8,45 @@
 import Foundation
 
 
-
+//MARK: VARIABILI GLOBALI
 class AppVariables: ObservableObject {
     @Published var globalName: String = "" {
-        didSet { saveToUserDefaults() }
+        didSet {
+            print("globalName cambiato a: \(globalName)")
+            saveToUserDefaults() }
     }
     @Published var cognome: String = "" {
-        didSet { saveToUserDefaults() }
+        didSet {
+            print("cognome cambiato a: \(cognome)")
+            saveToUserDefaults() }
     }
     @Published var age: Int = 15 {
-        didSet { saveToUserDefaults() }
+        didSet {
+            print("age cambiato a: \(age)")
+            saveToUserDefaults() }
     }
     @Published var sex: String = "" {
-        didSet { saveToUserDefaults() }
+        didSet {
+            print("sex cambiato a: \(sex)")
+            saveToUserDefaults() }
     }
     @Published var nickname: String = "" {
-        didSet { saveToUserDefaults() }
+        didSet {
+            print("nickname cambiato a: \(nickname)")
+            saveToUserDefaults() }
     }
     
     init() {
+        print("Inizializzazione AppVariables")
         if let savedUserData = UserDefaults.standard.dictionary(forKey: "currentUser") {
             self.nickname = savedUserData["nickname"] as? String ?? ""
             self.globalName = savedUserData["globalName"] as? String ?? ""
             self.cognome = savedUserData["cognome"] as? String ?? ""
             self.sex = savedUserData["sex"] as? String ?? ""
             self.age = savedUserData["age"] as? Int ?? 15
-        }
+        } else {
+            print("Nessun dato trovato in UserDefaults")
+      }
     }
     
     func toDictionary() -> [String: Any] {
@@ -49,6 +62,7 @@ class AppVariables: ObservableObject {
      func saveToUserDefaults() {
         let userDictionary = toDictionary()
         UserDefaults.standard.set(userDictionary, forKey: "currentUser")
+         print("Dati salvati in UserDefaults: \(userDictionary)")
     }
 
 
@@ -65,7 +79,7 @@ class AppVariables: ObservableObject {
         }
 }
 
-
+//MARK: DATABASE UTENTI
 class UserDefaultsManager {
     static let shared = UserDefaultsManager()
     private let userKey = "savedUsers"
@@ -97,7 +111,7 @@ class UserDefaultsManager {
         UserDefaults.standard.set(userDictionaries, forKey: userKey)
         return true
     }
-    // MARK: - Is First Launch
+   
         func isFirstLaunch() -> Bool {
             return UserDefaults.standard.bool(forKey: firstLaunchKey) == false
         }
@@ -109,10 +123,11 @@ class UserDefaultsManager {
 
 
 
-// codice user default
+// MARK: ABITUDINI
 class AbitudiniViewModel: ObservableObject {
     @Published var abitudini : [Abitudine] = [] {
         didSet {
+            print("Abitudini aggiornate: \(abitudini)")
             salvaDati()
         }
     }
@@ -120,15 +135,29 @@ class AbitudiniViewModel: ObservableObject {
     
     
     @Published var isDeleting: Bool = false
-    @Published var giornoSelezionato: Date? = nil
+    @Published var giornoSelezionato: Date? = nil {
+            didSet {
+                print("Giorno selezionato aggiornato: \(giornoSelezionato?.description ?? "nil")")
+            }
+        }
     @Published var giornoCorrente: Date = Date()
-    @Published var streakGiorni: [Date] = []
-    @Published var maxStreak: Int = 0 // Aggiungi questa variabile per il massimo streak
+    @Published var streakGiorni: [Date] = [] {
+            didSet {
+                print("Streak aggiornati: \(streakGiorni)")
+            }
+        }
+    @Published var maxStreak: Int = 0 {
+            didSet {
+                print("Massimo streak aggiornato a: \(maxStreak)")
+            }
+        }
     @Published var mostraConfetti: Bool = false
     @Published var mostraFraseRandom: Bool = false
     
     init() {
+        print("Inizializzazione AbitudiniViewModel")
         caricaDati()
+        
         
     }
     
@@ -137,9 +166,12 @@ class AbitudiniViewModel: ObservableObject {
            let abitudiniDecodificate = try? JSONDecoder().decode([Abitudine].self, from: dati) {
             DispatchQueue.main.async{
                 self.abitudini = abitudiniDecodificate
+                
             }
+            print("Abitudini caricate da UserDefaults: \(abitudini)")
         } else{
             self.abitudini = []
+            print("Nessuna abitudine trovata in UserDefaults")
         }
         if let dataSelezionata = UserDefaults.standard.object(forKey: "giornoSelezionato") as? Date {
                 self.giornoSelezionato = dataSelezionata
@@ -157,11 +189,13 @@ class AbitudiniViewModel: ObservableObject {
                    self.maxStreak = savedMaxStreak // Carica il massimo streak salvato
                }
         
+        
     }
     
     private func salvaDati() {
         if let dati = try? JSONEncoder().encode(abitudini) {
             UserDefaults.standard.set(dati, forKey: "abitudini")
+            print("Abitudini salvate in UserDefaults")
         }
         if let giornoSelezionato = giornoSelezionato {
             UserDefaults.standard.set(giornoSelezionato, forKey: "giornoSelezionato")
@@ -170,16 +204,18 @@ class AbitudiniViewModel: ObservableObject {
             UserDefaults.standard.set(streakDati, forKey: "streakGiorni")
         }
         UserDefaults.standard.set(maxStreak, forKey: "maxStreak")
+        
+       
     }
     
-//MARK: FUNZIONI HABITVIEW
+//FUNZIONI HABITVIEW
 
     func aggiungiAbitudine(nome: String, orario: String, giorno: Date, giorniSelezionati: [Bool], macroAbitudine: String){
-        
+        let giornoCorrente = Calendar.current.startOfDay(for: Date())
         let nuovaAbitudine = Abitudine(
             nome: nome,
             orario: orario,
-            giorno: giorno ,
+            giorno: giornoCorrente ,
             completata: false,
             daysOfWeek : giorniSelezionati,
             completamentiGiorni: Array(repeating: false, count: giorniSelezionati.filter { $0 }.count),
@@ -188,7 +224,7 @@ class AbitudiniViewModel: ObservableObject {
            
         )
         abitudini.append(nuovaAbitudine)
-        
+        print("Nuova abitudine aggiunta: \(nuovaAbitudine)")
     }
     
     func eliminaAbitudine(id: UUID, daData data: Date) {
@@ -227,11 +263,14 @@ class AbitudiniViewModel: ObservableObject {
             
             aggiornaStreak()
             aggiornaMaxStreak()
+            
+            
         }else {
             print("Errore: abitudine con ID \(id) non trovata.")
         }
     }
     
+    // HOME
     func progressForCategory(_ macroAbitudine: String, forDay giorno: Date) -> (completate: Int, totale: Int) {
         // Filtra le abitudini per la macrocategoria
         let abitudiniFiltrate = abitudini.filter { $0.macroAbitudine == macroAbitudine }
@@ -253,6 +292,7 @@ class AbitudiniViewModel: ObservableObject {
             giornoSelezionato = giornoCorrente
         }
     
+    //STREAK
     func calcolaStreakPerGiorno(giorno: Date) -> Bool {
             let abitudiniGiorno = abitudini.filter { abitudine in
                 let weekdayIndex = (Calendar.current.component(.weekday, from: giornoSelezionato!) + 5) % 7
@@ -262,6 +302,7 @@ class AbitudiniViewModel: ObservableObject {
             }
 
             let completate = abitudiniGiorno.filter { $0.completamentiDate[giorno] == true }.count
+        print("Abitudini completate per il giorno \(giorno): \(completate) su \(abitudiniGiorno.count)")
             return completate == abitudiniGiorno.count && !abitudiniGiorno.isEmpty
         }
 
@@ -272,6 +313,7 @@ class AbitudiniViewModel: ObservableObject {
         if completatoOggi {
             if !streakGiorni.contains(where: { Calendar.current.isDate($0, inSameDayAs: giornoCorrente) }) {
                 streakGiorni.append(giornoCorrente)
+                print("Giorno aggiunto allo streak: \(giornoCorrente)")
             }
             
             if calcolaStreakConsecutivo() > 0 {
@@ -279,6 +321,7 @@ class AbitudiniViewModel: ObservableObject {
                     }
                 } else {
                     streakGiorni.removeAll(where: { Calendar.current.isDate($0, inSameDayAs: giornoCorrente) })
+                    print("Giorno rimosso dallo streak: \(giornoCorrente)")
                 }
         
         salvaDati()
@@ -298,6 +341,7 @@ class AbitudiniViewModel: ObservableObject {
                    break
                }
            }
+        print("Streak consecutivo calcolato: \(streak)")
         return streak
     }
     func totaleHabitsCompletate() -> Int {
@@ -311,19 +355,30 @@ class AbitudiniViewModel: ObservableObject {
            if streakAttuale > maxStreak {
                maxStreak = streakAttuale
                salvaDati() // Salva il nuovo massimo streak
+               print("Nuovo massimo streak: \(maxStreak)")
            }
        }
-    
+    //prova per resettare le abitudini dal database
     func resetHabitsDone() {
         for index in abitudini.indices {
             abitudini[index].completamentiDate.removeAll()
         }
         salvaDati()
     }
+    
+   
+
+     func getStartOfWeek(for date: Date) -> Date {
+            let calendar = Calendar.current
+            let weekday = calendar.component(.weekday, from: date)
+            let firstWeekday = calendar.firstWeekday
+            let daysToSubtract = (weekday - firstWeekday + 7) % 7
+            return calendar.date(byAdding: .day, value: -daysToSubtract, to: date)!
+        }
 }
 
 
- 
+ //MARK: RISPARMIO
 class RisparmioViewModel: ObservableObject {
     // Variabili persistenti
     @Published var goalAmount: Double? = UserDefaults.standard.object(forKey: "goalAmount") as? Double
@@ -376,7 +431,7 @@ class RisparmioViewModel: ObservableObject {
         }
     }
  
-    // Resetta l'obiettivo una volta raggiunto
+    // Resetta l'obiettivo una volta raggiunto (prova)
     func resetGoal() {
         if let completedGoalAmount = goalAmount {
             completedGoals.append(CompletedGoal(goalAmount: completedGoalAmount, currentSavings: currentSavings))
@@ -387,8 +442,9 @@ class RisparmioViewModel: ObservableObject {
     }
 }
 
+//MARK: MACROCATEGORIA
 class HabitsManager: ObservableObject {
-    static let shared = HabitsManager() // Singleton per l'uso in tutta l'app
+    static let shared = HabitsManager()
     @Published var habits: [String] {
         didSet {
             UserDefaults.standard.set(habits, forKey: "userHabits")
@@ -403,6 +459,7 @@ class HabitsManager: ObservableObject {
             habits.append(habit)
         }
     }
+    // Prova per eliminare le macroabitudini
     func removeHabit(_ habit: String) {
         habits.removeAll { $0 == habit }
     }

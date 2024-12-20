@@ -46,10 +46,6 @@ struct Streak: View {
                         .opacity(0.6)
                         .frame(maxWidth: .infinity)
                         .frame( height: 600)
-                        
-                        
-                        
-                        
                         .cornerRadius(20)
                     VStack(alignment: .leading, spacing: 20) {
                         
@@ -78,22 +74,18 @@ struct Streak: View {
                                     .onTapGesture {
                                         viewModel.giornoSelezionato = giorno
                                     }
-                                
-                                
                             }
                         }
                         HStack{
                             Spacer()
                             VStack(alignment: .center, spacing: 20) {
-                                
-                                
                                 // Cerchio centrale per lo streak
                                 ZStack {
                                     Circle()
                                         .stroke(Color("bluino").opacity(0.3), lineWidth: 15)
                                         .frame(width: 120, height: 120)
                                     Circle()
-                                        .trim(from: 0, to: CGFloat(min(Double(viewModel.calcolaStreakConsecutivo()) / 30.0, 1.0))) // Massimo 30 giorni
+                                        .trim(from: 0, to: CGFloat(min(Double(viewModel.calcolaStreakConsecutivo()) / 30.0, 1.0)))
                                         .stroke(Color.ocean, style: StrokeStyle(lineWidth: 15, lineCap: .round))
                                         .frame(width: 150, height: 150)
                                         .rotationEffect(Angle(degrees: -90))
@@ -109,7 +101,7 @@ struct Streak: View {
                                 .padding(.bottom, 20)
                             }
                             VStack {
-                                Image(systemName: "checklist") // Puoi sostituirlo con un'icona personalizzata
+                                Image(systemName: "checklist")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 40, height: 40)
@@ -156,6 +148,7 @@ struct Streak: View {
                             }
                             Spacer()
                         }
+                        //bottone per resettare le abitudini completate
                         /*Button(action: {
                          viewModel.resetHabitsDone()
                          }, label: {
@@ -169,23 +162,15 @@ struct Streak: View {
                     .padding()
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 }.padding()
-        } // fine Vstack
-        
+        }
         .onAppear{
             viewModel.aggiornaStreak()
+            print("StreakView onAppear: StreakGiorni=\(viewModel.streakGiorni), MaxStreak=\(viewModel.maxStreak)")
         }
             
         }
-        
-        
     }
-        
-        
 }
-
-
-
-
 #Preview {
     Goals(selected:1)
         .environmentObject(AppVariables())

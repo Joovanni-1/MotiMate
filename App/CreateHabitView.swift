@@ -7,7 +7,7 @@
 
 
 import SwiftUI
-//import UserNotifications
+
  
 struct CreateHabitView: View {
     
@@ -15,8 +15,6 @@ struct CreateHabitView: View {
     @ObservedObject var viewModel: AbitudiniViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var nomeAbitudine: String = ""
-    
-    
     @State private var orarioAbitudine: Date = Date()
     @State private var giorniSelezionati: [Bool] = Array(repeating: false, count: 7)
     @State private var reminderEnabled: Bool = false
@@ -31,39 +29,19 @@ struct CreateHabitView: View {
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: _date )
     }
-   
-    //@State private var showReminderScreen: Bool = false
     
     var body: some View {
         NavigationView {
                     VStack(spacing: 20) {
                         TextField("Nome abitudine", text: $nomeAbitudine)
+                            
                             .padding()
                             .background(Color(UIColor.systemGray6))
                             .cornerRadius(10)
-                           
-                        HStack {
-                            Button(action: {
-                                
-                            }) {
-                                Image(systemName: "bell")
-                                    .foregroundColor(.blue)
-                            }
-                            
-                            
-                            Spacer()
-                            Button(action: {
-                                // Placeholder for an action (e.g., pick color)
-                            }) {
-                                Circle()
-                                    .fill(Color.blue)
-                                    .frame(width: 24, height: 24)
-                            }
-                        }
-                        .padding(.horizontal)
                         VStack( spacing: 10) {
                             HStack {
-                                Text("Seleziona i giorni")            .font(.headline)
+                                Text("Seleziona i giorni")
+                                    .font(.headline)
                                 Spacer()
                             }
                         
@@ -78,14 +56,12 @@ struct CreateHabitView: View {
                                             .foregroundColor(giorniSelezionati[index] ? .white : .black)
                                             .cornerRadius(16)
                                     })
+                                    
                                 }
                             }
                         }
-                        // da modificare!!!
-                        
-                        
                         Toggle(isOn: $reminderEnabled) {
-                            Text("Ricordami alle ore : ")
+                            Text("Orario: ")
                                 .font(.headline)
                         }
                         .padding()
@@ -96,8 +72,6 @@ struct CreateHabitView: View {
                         }
                         Spacer()
                         Button(action: {
-                            
-                            
                             // Se ha compilato tutti i campi aggiunge la nuova abitudine al ViewModel
                             if isFormValid {
                                 viewModel.aggiungiAbitudine(
@@ -108,7 +82,7 @@ struct CreateHabitView: View {
                                     macroAbitudine: macroAbitudine
                                 )
                                 
-                                //scheduleNotification()
+                               
                                 presentationMode.wrappedValue.dismiss()
                             }else{
                                 showAlert = true
@@ -121,12 +95,12 @@ struct CreateHabitView: View {
                                 .foregroundColor(.white)
                                 .cornerRadius(10)
                         })
+                        
                         .padding(.horizontal)
                         .alert(isPresented: $showAlert){
                             Alert( title: Text("Per favore, assicurati di aver compilato tutti i dati!"),  message: Text(""), dismissButton: .default(Text("OK")))}
                         
                     }
-                    
                     .padding()
                     .navigationTitle("Crea un'abitudine")
                     .navigationBarItems(leading: Button("Annulla") {
@@ -135,12 +109,7 @@ struct CreateHabitView: View {
                     
                 }
             }
- 
-    
         }
- 
- 
- 
 #Preview {
     CreateHabitView(viewModel: AbitudiniViewModel(), macroAbitudine: "Attività Fisica")
 }

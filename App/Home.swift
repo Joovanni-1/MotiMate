@@ -8,18 +8,18 @@
 import SwiftUI
 
 struct Home: View {
+   //MARK: VARIABILI
     @EnvironmentObject var variables: AppVariables
     @Binding var showTabView: Bool
     @EnvironmentObject var viewModel: AbitudiniViewModel
     @EnvironmentObject var viewModel1: RisparmioViewModel
     @EnvironmentObject var habitsManager: HabitsManager
-    //@State var habits:[String] = ["Risparmio", "Attività Fisica","Salute Mentale","Alimentazione e Idratazione","Studio e Creatività"]
     @State var newHabit: String = ""
     @State var isAddingNewHabit: Bool = false
     @State var page1: Bool = false
+    
+    //MARK: STRUTTURA HOME
     var body: some View {
-        
-            
             ScrollView{
                 
                 VStack(alignment: .leading, spacing: 10) {
@@ -45,7 +45,6 @@ struct Home: View {
                 .offset(x: 150,y:-107)
                 
                 if isAddingNewHabit {
-                    
                     TextField("Inserisci nuova abitudine", text: $newHabit)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding()
@@ -80,12 +79,8 @@ struct Home: View {
                             .foregroundColor(.red)
                     })
                     .padding(.horizontal)
-                    
-                    //fine v stack
                 }
-                
-                
-                
+//Iterazione macroabitudine
                 ForEach (habitsManager.habits, id:\.self){ habit in
                     
                     NavigationLink(destination: destinationView(for: habit)
@@ -100,9 +95,7 @@ struct Home: View {
                             RoundedRectangle(cornerRadius:20)
                                 .fill(Color.moss)
                                 .stroke(Color.black, lineWidth:2)
-                                
                                 .overlay(
-                                    
                                     HStack{
                                         Spacer()
                                         
@@ -112,22 +105,16 @@ struct Home: View {
                                                     ZStack{ Image("new")
                                                             .resizable()
                                                             .scaledToFit()
-                                                        
-                                                        
                                                     }.frame(width: 100)
-                                                        .offset(x:-90, y:-74 )
+                                                        .offset(x:-110, y:-74 )
                                                 }
-                                                
                                                 Text(habit)
                                                     .font(.system(size: 26))
                                                     .bold()
-                                                
-                                                
                                             }
                                         }
                                         
                                         Spacer()
-                                        //SVGtoSwiftUIView(divisions:5, completation: 3)
                                         if habit == "Risparmio" { VStack {
                                             Text("€\(viewModel1.currentSavings, specifier: "%.2f") / €\(viewModel1.goalAmount ?? 0, specifier: "%.2f")")
                                                 .font(.headline)
@@ -149,16 +136,7 @@ struct Home: View {
                         }
                     )
                 }
-                
-                
-                
-                
-                
-                
             }
-            
-            
-        
     }
     
     @ViewBuilder
@@ -173,26 +151,6 @@ struct Home: View {
     }
    
 }
-
-                                    
-                                   
-                                    
-
-#Preview {
-    Goals(selected:0)
-        .environmentObject(AppVariables())
-     .environmentObject(AbitudiniViewModel())
-     .environmentObject(RisparmioViewModel())
-     .environmentObject(HabitsManager())
-    /*Home(
-            selected: .constant(0), // Tab selezionato di default
-            showTabView: .constant(true) // TabView visibile di default
-        )
-        .environmentObject(AbitudiniViewModel())
-        .environmentObject(AppVariables())*/
-
-}
-
 struct SVGtoSwiftUIView: View {
     var divisions: Int  // Numero di divisioni del cerchio
     var completation: Int
@@ -221,11 +179,15 @@ struct SVGtoSwiftUIView: View {
                 }
             }
             .frame(width: 186, height: 186)
-            
-            
         }
-    
     }
 
 
 
+#Preview {
+    Goals(selected:0)
+        .environmentObject(AppVariables())
+     .environmentObject(AbitudiniViewModel())
+     .environmentObject(RisparmioViewModel())
+     .environmentObject(HabitsManager())
+}
