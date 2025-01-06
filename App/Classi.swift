@@ -13,28 +13,23 @@ class AppVariables: ObservableObject {
     @Published var globalName: String = "" {
         didSet {
             print("globalName cambiato a: \(globalName)")
-            saveToUserDefaults() }
-    }
+            saveToUserDefaults() }}
     @Published var cognome: String = "" {
         didSet {
             print("cognome cambiato a: \(cognome)")
-            saveToUserDefaults() }
-    }
+            saveToUserDefaults() }}
     @Published var age: Int = 15 {
         didSet {
             print("age cambiato a: \(age)")
-            saveToUserDefaults() }
-    }
+            saveToUserDefaults() }}
     @Published var sex: String = "" {
         didSet {
             print("sex cambiato a: \(sex)")
-            saveToUserDefaults() }
-    }
+            saveToUserDefaults() }}
     @Published var nickname: String = "" {
         didSet {
             print("nickname cambiato a: \(nickname)")
-            saveToUserDefaults() }
-    }
+            saveToUserDefaults() }}
     
     init() {
         print("Inizializzazione AppVariables")
