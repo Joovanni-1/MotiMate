@@ -458,3 +458,51 @@ class HabitsManager: ObservableObject {
         habits.removeAll { $0 == habit }
     }
 }
+
+class SfideManager: ObservableObject {
+    @Published var sfide: [Sfida] {
+        didSet {
+            salvaSfide()
+        }
+    }
+    @Published var sfideCompletate: [Sfida] {
+        didSet {
+            salvaSfideCompletate()
+        }
+    }
+
+    private let sfideKey = "sfideKey"
+    private let sfideCompletateKey = "sfideCompletateKey"
+
+    init() {
+        self.sfide = SfideManager.caricaSfide(key: sfideKey) ?? [
+            Sfida(nome: "No zucchero", giorniTotali: 5, giorniCompletati: 0),
+            Sfida(nome: "Non fumare", giorniTotali: 7, giorniCompletati: 0),
+            Sfida(nome: "No alcolici", giorniTotali: 14, giorniCompletati: 0)
+        ]
+        self.sfideCompletate = SfideManager.caricaSfide(key: sfideCompletateKey) ?? []
+    }
+
+    // Salvataggio sfide attive
+    private func salvaSfide() {
+        if let encoded = try? JSONEncoder().encode(sfide) {
+            UserDefaults.standard.set(encoded, forKey: sfideKey)
+        }
+    }
+
+    // Salvataggio sfide completate
+    private func salvaSfideCompletate() {
+        if let encoded = try? JSONEncoder().encode(sfideCompletate) {
+            UserDefaults.standard.set(encoded, forKey: sfideCompletateKey)
+        }
+    }
+
+    // Caricamento sfide
+    private static func caricaSfide(key: String) -> [Sfida]? {
+        if let data = UserDefaults.standard.data(forKey: key),
+           let decoded = try? JSONDecoder().decode([Sfida].self, from: data) {
+            return decoded
+        }
+        return nil
+    }
+}

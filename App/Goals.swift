@@ -32,6 +32,12 @@ struct Goals: View {
                                 Image(systemName: "flame.fill")
                             }
                         }.tag(1)
+                    SfideView()
+                        .tabItem{
+                            VStack{
+                                Image(systemName: "trophy.fill")
+                            }
+                        }.tag(2)
                     Profile()
                         .tabItem{
                             VStack {
@@ -39,13 +45,13 @@ struct Goals: View {
                                 Image(systemName: "person")
                                 
                             }
-                        }.tag(2)
+                        }.tag(3)
                     Settings()
                         .tabItem{
                             VStack {Spacer().frame(height: 20)
                                 Image(systemName: "gear")
                             }
-                        }.tag(3)
+                        }.tag(4)
                 }.accentColor(Color.black)
                     .onAppear{
                         print("Goals View onAppear")
