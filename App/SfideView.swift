@@ -142,9 +142,7 @@ struct SfidaRow: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
             }
-
             Spacer()
-
             // Pulsante "Completa un giorno"
             Button(action: { completaGiorno(sfida.id) }) {
                 Text("Completa giorno")
@@ -153,7 +151,6 @@ struct SfidaRow: View {
                     .foregroundColor(.white)
                     .cornerRadius(8)
             }
-
             // Pulsante "Elimina"
             Button(action: { eliminaSfida(sfida.id) }) {
                 Image(systemName: "trash")
@@ -170,6 +167,7 @@ struct SfidaRow: View {
 
 struct SfideCompletateView: View {
     var sfideCompletate: [Sfida]
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationView {
@@ -208,9 +206,7 @@ struct SfideCompletateView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Chiudi") {
-                        if let root = UIApplication.shared.windows.first?.rootViewController {
-                            root.dismiss(animated: true)
-                        }
+                        dismiss()
                     }
                 }
             }

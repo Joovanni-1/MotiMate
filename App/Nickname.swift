@@ -100,17 +100,20 @@ struct Nickname: View{
                 Button(action: {
                     if !variables.nickname.isEmpty && !variables.globalName.isEmpty && !variables.cognome.isEmpty &&
                         !variables.sex.isEmpty{
-                      
+                        
                         let isSaved = UserDefaultsManager.shared.saveUser(variables)
                         if isSaved {
                             click.toggle()
                             print("Nickname salvato: \(nickname)")
-                    }else{
+                        }else{
+                            showAlert = true
+                        }
+                    } else{
                         showAlert = true
                     }
-                } else{
-                    showAlert = true
-                }}, label: {
+                    // è stato messo per non far vedere la schermata ContentView e Nickname dopo essere stata compilata 
+                    UserDefaults.standard.set(true, forKey: "isFirstLaunch")
+                }, label: {
                     VStack{
                         Image(systemName:"arrowshape.forward")
                         Text("Avanti")
